@@ -1,0 +1,10 @@
+TAGS
+
+.cache
+core.*
+
+*.pyc
+*.swp
+.*.swp
+.#*
+
