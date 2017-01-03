@@ -5,8 +5,9 @@ import h5py
 import numpy as np
 from collections import Mapping
 
-from YALL.declarative import NOARG
-from YALL.declarative.utils.interrupt_delay import DelayedKeyboardInterrupt
+from .. import NOARG
+from ..utilities.interrupt_delay import DelayedKeyboardInterrupt
+
 
 def hdf_group_is(item):
     return isinstance(item, (h5py.File, h5py.Group))
@@ -36,11 +37,11 @@ class HDFDeepBunch(object):
         self,
         hdf = None,
         vpath = None,
-        writeable = False,
+        writable = False,
         overwrite = False,
     ):
         if isinstance(hdf, str):
-            if writeable:
+            if writable:
                 hdf = h5py.File(hdf, 'a')
                 if vpath is None:
                     vpath = True
@@ -66,6 +67,10 @@ class HDFDeepBunch(object):
         return
 
     def _resolve_hdf(self):
+        """
+        Returns the hdf object stored at the currently-referenced group.
+        If the current reference is virtual, then the hdf is indexed and may throw if the groups do not exist.
+        """
         if not self._vpath:
             return self._hdf
         try:
@@ -183,12 +188,28 @@ class HDFDeepBunch(object):
     def update_from_dict_recursive(
         self,
         data_dict,
-        use_iteritems     = False,
         groups_overwrite  = False,
         hdf_internal_link = False,
         hdf_external_link = False,
         hdf_copy          = False,
     ):
+        """
+        Provide a recursive dictionary or collections.Mapping compatible object as the first argument. This dictionary is "injected" into the hdf file.
+        Sub-mappings become groups and non-mappings become data arrays.
+
+        If the bunch is in overwrite-mode, then data may be overwritten with new data or groups.
+
+        If the groups_overwrite is specified, then even groups may be overwritten
+
+        If the dictionary provided contains some elements which are themselves HDF Files, Groups or other HDFDeepBunch objects, then the keywords
+        hdf_internal_link = False
+        hdf_external_link = False
+        hdf_copy          = False
+        are used to determine if links should be used or if the data should be copied.
+        hdf_internal_link acts if the referenced file is the same as the one receiving the update_from_dict_recursive call.
+        Otherwise hdf_external_link will create a file link (currently not implemented and throws NotImplementedError).
+        If hdf_copy is specified and the appropriate link option is false, then the hdf groups are copied.
+        """
         self._require_hdf()
         def apply_hdf(subref, key, hdf):
             refhdf = subref._require_hdf()
@@ -211,18 +232,19 @@ class HDFDeepBunch(object):
                     refhdf[key] = hdf
                 elif hdf_copy:
                     refhdf.copy(hdf, key)
+                else:
+                    raise RuntimeError("Object provided is an internal HDF group or bunch, but neither hdf_copy nor hdf_internal_link specified")
             else:
                 if hdf_external_link:
                     raise NotImplementedError()
                 elif hdf_copy:
                     refhdf.copy(hdf, key)
+                else:
+                    raise RuntimeError("Object provided is an external HDF group or bunch, but neither hdf_copy nor hdf_external_link specified")
 
         def recursive_action(subref, data_dict):
             for key, value in data_dict.items():
-                if (
-                    isinstance(value, Mapping)
-                    or (use_iteritems and hasattr(value, 'iteritems'))
-                ):
+                if isinstance(value, Mapping):
                     if groups_overwrite:
                         self.require_deleted(key)
                         subsubref = subref[key]
@@ -319,12 +341,6 @@ class HDFDeepBunch(object):
             vpath,
             self._overwrite
         )
-
-    #def __eq__(self, other):
-    #    return
-    #
-    #def __ne__(self, other):
-    #    return not (self == other)
 
     def __iter__(self):
         hdf = self._resolve_hdf()

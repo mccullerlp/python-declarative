@@ -2,7 +2,7 @@
 """
 debug_loud = False
 
-from ..utils.representations import ReprMixin
+from ..utilities.representations import ReprMixin
 from ..properties import mproperty
 
 _UNIQUE = ("UNIQUE",)

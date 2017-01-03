@@ -34,7 +34,6 @@ from .callbacks import (
     min_max_validator_int,
 )
 
-from .utils.lazy import lazy
 from .bunch import (
     Bunch,
     DeepBunch,
@@ -43,12 +42,6 @@ from .bunch import (
 
 from .overridable_object import (
     OverridableObject,
-)
-
-from .parent_carriers import (
-    ParentCarrier,
-    ParentRoot,
-    recurse_down_parents_for,
 )
 
 from .metaclass import (

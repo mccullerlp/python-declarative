@@ -4,14 +4,18 @@ import types
 
 from .properties import HasDeclaritiveAttributes
 
-from .utils.representations import SuperBase
+from .utilities.representations import SuperBase
 
 
 class OverridableObject(HasDeclaritiveAttributes, SuperBase, object):
+    """
+    """
     _overridable_object_save_kwargs = False
     _overridable_object_kwargs = None
 
     def _overridable_object_inject(self, **kwargs):
+        """
+        """
         kwargs_unmatched = {}
         for key, obj in list(kwargs.items()):
             try:
@@ -37,6 +41,8 @@ class OverridableObject(HasDeclaritiveAttributes, SuperBase, object):
         return kwargs_unmatched
 
     def __init__(self, **kwargs):
+        """
+        """
         if self._overridable_object_save_kwargs:
             self._overridable_object_kwargs = kwargs
         kwargs_unmatched = self._overridable_object_inject(**kwargs)
@@ -57,5 +63,7 @@ class OverridableObject(HasDeclaritiveAttributes, SuperBase, object):
         return
 
     def _post_init(self):
+        """
+        """
         return
 
