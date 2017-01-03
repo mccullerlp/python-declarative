@@ -1,0 +1,54 @@
+{
+    "docs": [
+        {
+            "location": "/index.html", 
+            "text": "Python-Declarative\n\n\nFor full documentation visit \npython-declarative\n.\n\n\nCheckout [[README]]\n\n\nCommands\n\n\n\n\nmkdocs new [dir-name]\n - Create a new project.\n\n\nmkdocs serve\n - Start the live-reloading docs server.\n\n\nmkdocs build\n - Build the documentation site.\n\n\nmkdocs help\n - Print this help message.\n\n\n\n\nProject layout\n\n\nimport declarative\n\nclass Child(object):\n    id = None\n\nclass Parent(object):\n    @declarative.mproperty\n    def child_registry(self):\n        return set()\n\n    @declarative.mproperty\n    def c1(self):\n        print \nMaking Parent.c1\n\n        child = Child()\n        child.id = 1\n        self.child_registry.add(child)\n        return child\n\n    @declarative.mproperty\n    def c2(self):\n        print \nMaking Parent.c2\n\n        child = Child()\n        child.id = 1\n        self.child_registry.add(child)\n        return child\n\nparent = Parent()\nparent.c1\n#\n Making Parent.c1\nparent.c2\n#\n Making Parent.c2\nprint parent.child_registry", 
+            "title": "Home"
+        }, 
+        {
+            "location": "/index.html#python-declarative", 
+            "text": "For full documentation visit  python-declarative .  Checkout [[README]]", 
+            "title": "Python-Declarative"
+        }, 
+        {
+            "location": "/index.html#commands", 
+            "text": "mkdocs new [dir-name]  - Create a new project.  mkdocs serve  - Start the live-reloading docs server.  mkdocs build  - Build the documentation site.  mkdocs help  - Print this help message.", 
+            "title": "Commands"
+        }, 
+        {
+            "location": "/index.html#project-layout", 
+            "text": "import declarative\n\nclass Child(object):\n    id = None\n\nclass Parent(object):\n    @declarative.mproperty\n    def child_registry(self):\n        return set()\n\n    @declarative.mproperty\n    def c1(self):\n        print  Making Parent.c1 \n        child = Child()\n        child.id = 1\n        self.child_registry.add(child)\n        return child\n\n    @declarative.mproperty\n    def c2(self):\n        print  Making Parent.c2 \n        child = Child()\n        child.id = 1\n        self.child_registry.add(child)\n        return child\n\nparent = Parent()\nparent.c1\n#  Making Parent.c1\nparent.c2\n#  Making Parent.c2\nprint parent.child_registry", 
+            "title": "Project layout"
+        }, 
+        {
+            "location": "/README/index.html", 
+            "text": "Declarative Python\n\n\nCollection of decorators and base classes to allow a declarative style of programming. The \nunderlying philosophy is \ninit considered harmful\n.\n\n\nQuick Example\n\n\nimport declarative\n\nclass Child(object):\n    id = None\n\nclass Parent(object):\n    @declarative.mproperty\n    def child_registry(self):\n        return set()\n\n    @declarative.mproperty\n    def c1(self):\n        print \nMaking Parent.c1\n\n        child = Child()\n        child.id = 1\n        self.child_registry.add(child)\n        return child\n\n    @declarative.mproperty\n    def c2(self):\n        print \nMaking Parent.c2\n\n        child = Child()\n        child.id = 1\n        self.child_registry.add(child)\n        return child\n\nparent = Parent()\nparent.c1\n#\n Making Parent.c1\nparent.c2\n#\n Making Parent.c2\nprint parent.child_registry\n\n\n\n\nOk, so now as the \n\n\nMore automatic Example\n\n\nDocumentation\n\n\nTODO Provide Link\n\n\nRelated Documentation\n\n\n\n\nhttps://fuhm.net/super-harmful/", 
+            "title": "Overview"
+        }, 
+        {
+            "location": "/README/index.html#declarative-python", 
+            "text": "Collection of decorators and base classes to allow a declarative style of programming. The \nunderlying philosophy is  init considered harmful .", 
+            "title": "Declarative Python"
+        }, 
+        {
+            "location": "/README/index.html#quick-example", 
+            "text": "import declarative\n\nclass Child(object):\n    id = None\n\nclass Parent(object):\n    @declarative.mproperty\n    def child_registry(self):\n        return set()\n\n    @declarative.mproperty\n    def c1(self):\n        print  Making Parent.c1 \n        child = Child()\n        child.id = 1\n        self.child_registry.add(child)\n        return child\n\n    @declarative.mproperty\n    def c2(self):\n        print  Making Parent.c2 \n        child = Child()\n        child.id = 1\n        self.child_registry.add(child)\n        return child\n\nparent = Parent()\nparent.c1\n#  Making Parent.c1\nparent.c2\n#  Making Parent.c2\nprint parent.child_registry  Ok, so now as the", 
+            "title": "Quick Example"
+        }, 
+        {
+            "location": "/README/index.html#more-automatic-example", 
+            "text": "", 
+            "title": "More automatic Example"
+        }, 
+        {
+            "location": "/README/index.html#documentation", 
+            "text": "TODO Provide Link", 
+            "title": "Documentation"
+        }, 
+        {
+            "location": "/README/index.html#related-documentation", 
+            "text": "https://fuhm.net/super-harmful/", 
+            "title": "Related Documentation"
+        }
+    ]
+}
