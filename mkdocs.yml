@@ -1,0 +1,17 @@
+site_name: Python Declarative
+pages:
+    - Home: index.md
+    - Overview: README.md
+theme: readthedocs
+site_dir: build/site/
+use_directory_urls: false
+dev_addr: 127.0.0.1:7999
+extra_css: [default.css]
+markdown_extensions:
+    #- codehilite
+    #- fenced_code
+    - smarty
+    - toc
+    #- wikilinks
+    - sane_lists
+    - admonition

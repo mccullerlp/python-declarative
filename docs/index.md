@@ -1,9 +1,17 @@
-# Declarative Python
+# Python-Declarative
 
-Collection of decorators and base classes to allow a declarative style of programming. The 
-underlying philosophy is "init considered harmful".
+For full documentation visit [python-declarative](https://github.org).
 
-## Quick Example
+Checkout [[README]]
+
+## Commands
+
+* `mkdocs new [dir-name]` - Create a new project.
+* `mkdocs serve` - Start the live-reloading docs server.
+* `mkdocs build` - Build the documentation site.
+* `mkdocs help` - Print this help message.
+
+## Project layout
 
 ```python
 import declarative
@@ -40,14 +48,3 @@ parent.c2
 print parent.child_registry
 ```
 
-Ok, so now as the 
-
-
-## More automatic Example
-
-## Documentation
-
-TODO Provide Link
-
-## Related Documentation
- *  https://fuhm.net/super-harmful/

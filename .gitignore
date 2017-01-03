@@ -2,6 +2,7 @@ venv/
 *.egg-info/
 build/
 dist/
+site/
 
 TAGS
 .cache
