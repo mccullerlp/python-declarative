@@ -1,8 +1,13 @@
-TAGS
+venv/
+*.egg-info/
+build/
+dist/
 
+TAGS
 .cache
 core.*
 
+*.syncthing.*
 *.pyc
 *.swp
 .*.swp

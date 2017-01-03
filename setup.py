@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import sys
 from distutils.sysconfig import get_python_lib
@@ -5,7 +6,7 @@ from distutils.sysconfig import get_python_lib
 from setuptools import find_packages, setup
 
 
-version = '1.0.0a0'
+version = '1.0.0a1'
 
 
 setup(
@@ -31,10 +32,9 @@ setup(
     zip_safe=False,
     keywords = 'declarative oop bunch callback attributes metaclass',
     classifiers=[
-        'Development Status :: 1 - Alpha ',
-        'Environment :: Libraries',
+        'Development Status :: 3 - Alpha ',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache License v2',
+        'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
@@ -43,7 +43,6 @@ setup(
         #'Programming Language :: Python :: 3.4',
         #'Programming Language :: Python :: 3.5',
         #'Programming Language :: Python :: 3.6',
-        'Topic :: Software Development :: Libraries :: OOP Frameworks',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 )
