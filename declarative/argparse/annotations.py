@@ -6,7 +6,7 @@ from __future__ import (
     absolute_import,
 )
 
-from YALL.declarative import (
+from .. import (
     Bunch,
     NOARG
 )
@@ -41,7 +41,7 @@ def argument(
         group       = None,
         **kwargs
 ):
-    def annotate(func):
+    def annotate_argument(func):
         if name is None:
             _name = func.__name__
         else:
@@ -84,9 +84,9 @@ def argument(
         )
         return func
     if func is None:
-        return annotate
+        return annotate_argument
     else:
-        return annotate(func)
+        return annotate_argument(func)
 
 #def arg_bool(func, ):
     #return
@@ -101,8 +101,8 @@ def group(
         **kwargs
 ):
     group = None
-    def annotate(func):
-        if not is_descriptor(func):
+    def annotate_group(func):
+        if not descriptor_check(func):
             raise RuntimeError("Must be a memoized descriptor")
         if name is None:
             _name = func.__name__
@@ -132,9 +132,9 @@ def group(
         )
         return func
     if func is None:
-        return annotate
+        return annotate_group
     else:
-        return annotate(func)
+        return annotate_group(func)
 
 def command(
         func = None,
@@ -143,7 +143,7 @@ def command(
         order = None,
         **kwargs
 ):
-    def annotate(func):
+    def annotate_command(func):
         if name is None:
             _name = func.__name__
         else:
@@ -161,12 +161,12 @@ def command(
         )
         return func
     if func is None:
-        return annotate
+        return annotate_command
     else:
-        return annotate(func)
+        return annotate_command(func)
 
 
-def is_descriptor(obj):
+def descriptor_check(obj):
     #TODO rubustify
     if not isinstance(obj, object):
         raise RuntimeError("Argparse decorator must be outermost decorator")

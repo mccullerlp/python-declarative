@@ -3,7 +3,7 @@
 from collections import Mapping
 from numbers import Number
 
-from ..properties import NOARG
+from ..utilities.unique import NOARG
 
 
 class ShadowBunch(object):

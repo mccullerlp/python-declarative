@@ -6,16 +6,10 @@ from __future__ import (
     absolute_import,
 )
 
-
-from .unique import (
-    NOARG,
-)
-
 from .bases import (
     PropertyTransforming,
     HasDeclaritiveAttributes,
     InnerException,
-    AssumesDeclaritiveAttributes,
 )
 
 from .memoized import (

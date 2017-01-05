@@ -9,7 +9,6 @@ from .properties import (
     dproperty_fns,
     mproperty_plain,
     dproperty_plain,
-    NOARG,
     mfunction,
     PropertyTransforming,
     group_dproperty,
@@ -49,6 +48,11 @@ from .metaclass import (
     Autodecorate,
     AttrExpandingObject,
     GetSetAttrExpandingObject,
+)
+
+from .utilities.unique import (
+    NOARG,
+    unique_generator,
 )
 
 def first_non_none(*args):

@@ -5,7 +5,7 @@ import h5py
 import numpy as np
 from collections import Mapping
 
-from .. import NOARG
+from ..utilities.unique import NOARG
 from ..utilities.interrupt_delay import DelayedKeyboardInterrupt
 
 

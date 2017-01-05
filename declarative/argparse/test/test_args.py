@@ -1,22 +1,21 @@
 #!/usr/bin/env python2
 """
 """
-from __future__ import division, print_function
+from __future__ import (division, print_function, absolute_import)
 
-import YALL.declarative.argparse as ARG
-
-from YALL.declarative import (
+from declarative import (
     OverridableObject,
     mproperty,
     NOARG,
 )
 
+import declarative.argparse as ARG
 
 class APTester(ARG.OOArgParse, OverridableObject):
     """
     Runs the argparse test setup
     """
-    @ARG.argparse_arg(['-a', '--abc'])
+    @ARG.argument(['-a', '--abc'])
     @mproperty
     def atest(self, val = NOARG):
         """
@@ -26,7 +25,7 @@ class APTester(ARG.OOArgParse, OverridableObject):
             val = 'default'
         return val
 
-    @ARG.argparse_arg(['-b', '--btest'], group = '__tgroup__')
+    @ARG.argument(['-b', '--btest'], group = '__tgroup__')
     @mproperty
     def btest(self, val = NOARG):
         """
@@ -36,7 +35,7 @@ class APTester(ARG.OOArgParse, OverridableObject):
             val = 'default'
         return val
 
-    @ARG.argparse_arg(['-c', '--ctest'], group = '__tgroup_ME__')
+    @ARG.argument(['-c', '--ctest'], group = '__tgroup_ME__')
     @mproperty
     def ctest(self, val = NOARG):
         """
@@ -46,7 +45,7 @@ class APTester(ARG.OOArgParse, OverridableObject):
             val = 'default'
         return val
 
-    @ARG.argparse_arg(['-d', '--dtest'], group = '__tgroup_ME__')
+    @ARG.argument(['-d', '--dtest'], group = '__tgroup_ME__')
     @mproperty
     def dtest(self, val = NOARG):
         """
@@ -66,14 +65,14 @@ class APTester(ARG.OOArgParse, OverridableObject):
             val = 'default'
         return val
 
-    @ARG.argparse_group(name = 'Test Group')
+    @ARG.group(name = 'Test Group')
     @mproperty
     def __tgroup__(self, val = NOARG):
         """
         Group for testing
         """
 
-    @ARG.argparse_group(
+    @ARG.group(
         name = 'Test Group2',
         mutually_exclusive = True,
     )
@@ -83,7 +82,7 @@ class APTester(ARG.OOArgParse, OverridableObject):
         Group for testing Mutual Exclusivity
         """
 
-    @ARG.argparse_command()
+    @ARG.command()
     def run2(self, args):
         """
         Command Description

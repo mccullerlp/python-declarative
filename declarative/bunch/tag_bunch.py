@@ -2,7 +2,7 @@
 """
 from collections import Mapping
 
-from ..properties import NOARG
+from ..utilities.unique import NOARG
 from .deep_bunch import DeepBunch
 
 

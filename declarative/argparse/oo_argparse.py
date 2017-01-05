@@ -93,7 +93,8 @@ class OOArgParse(OverridableObject, SuperBase, object):
             if commands_byname:
                 ap.add_argument(
                     '__command__',
-                    choices = cmdlist,
+                    metavar = 'COMMAND',
+                    choices = cmdlist + [""],
                     default = None,
                     nargs='?',
                     help = argparse.SUPPRESS,
@@ -119,21 +120,21 @@ class OOArgParse(OverridableObject, SuperBase, object):
         #TODO fix -h handling requiring otherwise perfect other arguments
         if '-h' in args or '--help' in args or '--halp!' in args:
             try:
+                class BooBoo(Exception):
+                    pass
+                def error(message):
+                    raise BooBoo(message)
+                ap.error = error
                 args_parsed = ap.parse_args(args)
                 print_help = args_parsed.help
-            except SystemExit:
+            except BooBoo:
                 print_help = True
         else:
             args_parsed = ap.parse_args(args)
             print_help = args_parsed.help
 
         if print_help:
-            aph = argparse.ArgumentParser(
-                description = description,
-                parents = [ap],
-                add_help = False,
-            )
-            spp = aph.add_subparsers(dest = 'command')
+            spp = ap.add_subparsers(dest = 'command', help = "(May have subarguments, use -h after them)")
 
             if default_cmd is not None:
                 if default_cmd.__doc__ is not None:
@@ -151,7 +152,7 @@ class OOArgParse(OverridableObject, SuperBase, object):
                     cbunch.cmd_name,
                     help = cbunch.description,
                 )
-            aph.print_help()
+            ap.print_help()
             sys.exit(0)
 
         kwargs = dict()

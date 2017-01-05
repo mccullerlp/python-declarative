@@ -1,7 +1,5 @@
 """
 """
-debug_loud = False
-
 from ..utilities.representations import ReprMixin
 from ..properties import mproperty
 

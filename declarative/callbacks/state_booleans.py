@@ -1,13 +1,14 @@
 """
 """
-
+from __future__ import (print_function, absolute_import)
 from ..utilities.representations import ReprMixin
 from ..utilities.unique import unique_generator
 from ..properties import mproperty
+_debug_loud = False
+
 
 _UNIQUE = unique_generator()
 
-_debug_loud = False
 
 class RelayBoolBase(ReprMixin):
     """
