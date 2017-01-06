@@ -1,5 +1,8 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 """
+Test of the argparse library
+
+TODO: use automated features
 """
 from __future__ import (division, print_function, absolute_import)
 
@@ -11,7 +14,20 @@ from declarative import (
 
 import declarative.argparse as ARG
 
-class APTester(ARG.OOArgParse, OverridableObject):
+import pytest
+
+
+oldprint = print
+print_test_list = []
+def print(*args):
+    oldprint(*args)
+    if len(args) == 1:
+        print_test_list.append(args[0])
+    else:
+        print_test_list.append(args)
+
+
+class TArgParse(ARG.OOArgParse, OverridableObject):
     """
     Runs the argparse test setup
     """
@@ -87,7 +103,7 @@ class APTester(ARG.OOArgParse, OverridableObject):
         """
         Command Description
         """
-        print("Alternate Run Option!", args)
+        print("run2!", args)
         return self
 
     def __arg_default__(self):
@@ -102,9 +118,39 @@ class APTester(ARG.OOArgParse, OverridableObject):
 
 
 def test_args():
-    APTester.__cls_argparse__(['-a', '1234'])
+    print_test_list[:] = []
+    TArgParse.__cls_argparse__(['-a', '1234'])
+    assert(
+        print_test_list == [
+            ("atest: ", '1234'),
+            ("btest: ", 'default'),
+            ("ctest: ", 'default'),
+            ("dtest: ", 'default'),
+        ]
+    )
 
+    print_test_list[:] = []
+    TArgParse.__cls_argparse__(['-a', '1234', 'run2'])
+    assert(
+        print_test_list == [
+            ("run2!", []),
+        ]
+    )
+
+    print_test_list[:] = []
+    TArgParse.__cls_argparse__(['-a', '1234', 'run2', 'a', '-b', 'c'])
+    assert(
+        print_test_list == [
+            ("run2!", ['a', '-b', 'c']),
+        ]
+    )
+
+    print_test_list[:] = []
+    with pytest.raises(SystemExit):
+        TArgParse.__cls_argparse__(['run_broke'])
+
+    return
 
 if __name__ == '__main__':
-    APTester.__cls_argparse__()
+    TArgParse.__cls_argparse__()
 

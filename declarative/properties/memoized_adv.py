@@ -7,10 +7,11 @@ from __future__ import (
 )
 
 
-from .unique import (
+from ..utilities.unique import (
     NOARG,
     unique_generator
 )
+
 
 from .bases import (
     InnerException,

@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 """
+Tests of the argparse api. Not really testing the declarative argparse library, but helpful for development of it.
 """
 import argparse
 

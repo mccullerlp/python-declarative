@@ -9,7 +9,7 @@ from __future__ import (
 
 from functools import partial
 
-from .unique import (
+from ..utilities.unique import (
     NOARG,
     unique_generator
 )

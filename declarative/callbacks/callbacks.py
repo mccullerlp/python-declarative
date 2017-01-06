@@ -117,7 +117,9 @@ class callbackmethod(object):
     def __get__(self, obj, cls):
         if obj is None:
             return self
-        callback = Callback(initialcall = functools.partial(self.fget, obj))
+        callback = Callback(
+            initialcall = functools.partial(self.fget, obj)
+        )
         #obj.__dict__[self.__name__] = callback
         setattr(obj, self.__name__, callback)
         return callback
