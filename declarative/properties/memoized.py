@@ -5,6 +5,7 @@ from __future__ import (
     print_function,
     absolute_import,
 )
+from builtins import object
 
 
 from functools import partial
@@ -94,8 +95,8 @@ class MemoizedDescriptor(object):
                 else:
                     result = self.fget(obj, result)
             except TypeError as e:
-                print ("TE:", e)
-                print("BOOBOO ON: ", obj.__class__, self.__name__)
+                print(("TE:", e))
+                print(("BOOBOO ON: ", obj.__class__, self.__name__))
                 raise
             if __debug__:
                 if result is NOARG:

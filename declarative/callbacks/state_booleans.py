@@ -24,7 +24,6 @@ class RelayBoolBase(ReprMixin):
     """
     __slots__ = ('callbacks_ontoggle', '_assign_protect')
     __repr_slots__ = ('is_set', 'name')
-    _assign_protect = None
 
     @property
     def is_set(self):
@@ -33,7 +32,7 @@ class RelayBoolBase(ReprMixin):
         """
         return bool(self)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return self.__bool__()
 
     def __bool__(self):

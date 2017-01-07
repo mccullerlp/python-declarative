@@ -1,5 +1,6 @@
 """
 """
+from builtins import object
 from collections import Mapping
 
 from ..utilities.unique import NOARG

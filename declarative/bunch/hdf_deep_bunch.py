@@ -1,6 +1,10 @@
 """
 Requires h5py to interface
 """
+from __future__ import print_function
+from builtins import str
+from builtins import range
+from builtins import object
 import h5py
 import numpy as np
 from collections import Mapping
@@ -171,7 +175,7 @@ class HDFDeepBunch(object):
                 hdf[key] = item
             return
         except TypeError:
-            print(item, type(item))
+            print((item, type(item)))
             raise TypeError("Can't insert {0} into {1} at key {2}".format(item, hdf, key))
         except (RuntimeError, ValueError) as E:
             if str(E).lower().find('name already exists') != -1 and self._overwrite:
@@ -243,7 +247,7 @@ class HDFDeepBunch(object):
                     raise RuntimeError("Object provided is an external HDF group or bunch, but neither hdf_copy nor hdf_external_link specified")
 
         def recursive_action(subref, data_dict):
-            for key, value in data_dict.items():
+            for key, value in list(data_dict.items()):
                 if isinstance(value, Mapping):
                     if groups_overwrite:
                         self.require_deleted(key)
@@ -366,7 +370,7 @@ class HDFDeepBunch(object):
         hdf = self._resolve_hdf()
         if hdf is None:
             return iter(())
-        return iter(hdf.keys())
+        return iter(list(hdf.keys()))
 
     def keys(self):
         hdf = self._resolve_hdf()
@@ -378,7 +382,7 @@ class HDFDeepBunch(object):
         hdf = self._resolve_hdf()
         if hdf is None:
             return
-        for key in hdf.keys():
+        for key in list(hdf.keys()):
             yield self[key]
         return
 
@@ -389,7 +393,7 @@ class HDFDeepBunch(object):
         hdf = self._resolve_hdf()
         if hdf is None:
             return
-        for key in hdf.keys():
+        for key in list(hdf.keys()):
             yield key, self[key]
         return
 

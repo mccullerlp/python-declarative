@@ -1,5 +1,6 @@
 """
 """
+from builtins import object
 from collections import Mapping
 from numbers import Number
 
@@ -13,8 +14,8 @@ class ShadowBunch(object):
     _names = {}
 
     #needed to not explode some serializers since this object generally "hasattr" almost anything
-    __reduce_ex__ = None
-    __reduce__    = None
+    #__reduce_ex__ = None
+    #__reduce__    = None
     __copy__      = None
     __deepcopy__  = None
 
@@ -166,33 +167,33 @@ class ShadowBunch(object):
     def __len__(self):
         ks = set()
         for d in self._dicts:
-            ks.update(self._shadow_dict.keys())
+            ks.update(list(self._shadow_dict.keys()))
         return len(ks)
 
     def iterkeys(self):
         ks = set()
         for d in self._dicts:
-            ks.update(d.keys())
+            ks.update(list(d.keys()))
         return iter(ks)
 
     def keys(self):
-        return list(self.iterkeys())
+        return list(self.keys())
 
     def itervalues(self):
-        for key in list(self.iterkeys()):
+        for key in list(self.keys()):
             yield self[key]
         return
 
     def values(self):
-        return list(self.itervalues())
+        return list(self.values())
 
     def iteritems(self):
-        for key in list(self.iterkeys()):
+        for key in list(self.keys()):
             yield key, self[key]
         return
 
     def items(self):
-        return list(self.iteritems())
+        return list(self.items())
 
 
 Mapping.register(ShadowBunch)

@@ -2,7 +2,9 @@
 """
 """
 from __future__ import division, print_function
+from builtins import object
 import warnings
+from future.utils import with_metaclass
 
 
 class AutodecorateMeta(type):
@@ -26,9 +28,7 @@ class AutodecorateMeta(type):
         return
 
 
-class Autodecorate(object):
-    __metaclass__ = AutodecorateMeta
-
+class Autodecorate(with_metaclass(AutodecorateMeta, object)):
     @classmethod
     def __mc_autodecorators__(cls, decorators):
         return decorators
@@ -92,7 +92,7 @@ class AttrExpandingObject(Autodecorate):
 
     def __dir__(self):
         predir = super(AttrExpandingObject, self).__dir__()
-        predir.extend(self._cls_getsetattr_expansion.iterkeys())
+        predir.extend(iter(self._cls_getsetattr_expansion.keys()))
         return predir
 
 

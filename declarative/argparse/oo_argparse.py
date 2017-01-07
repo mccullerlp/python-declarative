@@ -6,6 +6,8 @@ from __future__ import (
     print_function,
     absolute_import,
 )
+from future import standard_library
+standard_library.install_aliases()
 import argparse
 import collections
 
@@ -59,7 +61,7 @@ class OOArgParse(OverridableObject, SuperBase, object):
         )
 
         #build groups
-        glist = collections.deque(sorted([(v.order, k, v) for k, v in groups.iteritems()]))
+        glist = collections.deque(sorted([(v.order, k, v) for k, v in groups.items()]))
         gengroups = dict()
         gengroups[None] = ap
 
@@ -77,10 +79,10 @@ class OOArgParse(OverridableObject, SuperBase, object):
 
         default_cmd = getattr(cls, "__arg_default__", None)
         commands_byname = dict()
-        for name, cbunch in commands.iteritems():
+        for name, cbunch in commands.items():
             commands_byname[cbunch.cmd_name] = cbunch
 
-        cmdlist = list(k for o, k in sorted((v.order, k) for k, v in commands_byname.iteritems()))
+        cmdlist = list(k for o, k in sorted((v.order, k) for k, v in commands_byname.items()))
 
         if default_cmd is None:
             ap.add_argument(
@@ -109,7 +111,7 @@ class OOArgParse(OverridableObject, SuperBase, object):
             )
 
         argdo = dict()
-        for order, argname, argbunch in sorted([(v.order, k, v) for k, v in arguments.iteritems()]):
+        for order, argname, argbunch in sorted([(v.order, k, v) for k, v in arguments.items()]):
             useparse = gengroups.get(argbunch.group, None)
             argdo[argname] = argbunch.func(useparse)
 
@@ -146,7 +148,7 @@ class OOArgParse(OverridableObject, SuperBase, object):
                     help = doc,
                 )
 
-            for name, cbunch in commands.iteritems():
+            for name, cbunch in commands.items():
                 commands_byname[cbunch.cmd_name] = cbunch
                 spp.add_parser(
                     cbunch.cmd_name,
@@ -156,7 +158,7 @@ class OOArgParse(OverridableObject, SuperBase, object):
             sys.exit(0)
 
         kwargs = dict()
-        for argname, argbunch in arguments.iteritems():
+        for argname, argbunch in arguments.items():
             val = getattr(args_parsed, argname)
             if val is not NOARG:
                 kwargs[argbunch.name_inject] = val

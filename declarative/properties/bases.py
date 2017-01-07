@@ -5,15 +5,15 @@ from __future__ import (
     print_function,
     absolute_import,
 )
+from builtins import object
 
 import abc
 
 from ..utilities.representations import SuperBase
+from future.utils import with_metaclass
 
 
-class PropertyTransforming(object):
-    __metaclass__ = abc.ABCMeta
-
+class PropertyTransforming(with_metaclass(abc.ABCMeta, object)):
     @abc.abstractmethod
     def construct(
         self,
@@ -50,7 +50,7 @@ class HasDeclaritiveAttributes(SuperBase):
         super(HasDeclaritiveAttributes, self).__init__(**kwargs)
         attr_list = iter(self.__cls_decl_attrs__)
         #check that the first item is this class, if not then it must have pulled a parent's list
-        if attr_list.next() == self.__class__:
+        if next(attr_list) == self.__class__:
             for attr in attr_list:
                 getattr(self, attr)
         else:

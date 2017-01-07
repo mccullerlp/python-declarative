@@ -1,5 +1,6 @@
 """
 """
+from builtins import object
 import functools
 import threading
 

@@ -1,45 +1,22 @@
 """
 """
+from builtins import str
+from builtins import object
 from collections import Mapping, MutableSequence
 import numpy as np
 import copy
 
-_dictmethods = [
-    '__cmp__',
-    '__contains__',
-    '__delitem__',
-    '__eq__',
-    '__ge__',
-    '__gt__',
-    '__iter__',
-    '__le__',
-    '__len__',
-    '__lt__',
-    '__ne__',
-    '__setitem__',
-    '__sizeof__',
-    'clear',
-    'copy',
-    'fromkeys',
-    'get',
-    'has_key',
-    'items',
-    'iteritems',
-    'iterkeys',
-    'itervalues',
-    'keys',
-    'pop',
-    'popitem',
-    'setdefault',
-    'update',
-    'values',
-]
-
+_dictmethods = dir(dict)
+_dictmethods.remove('__new__')
+_dictmethods.remove('__getattribute__')
 
 def gen_func(mname):
     def func(self, *args, **kwargs):
+        print(mname)
         return getattr(self._mydict, mname)(*args, **kwargs)
     orig_func = getattr(dict, mname)
+    if orig_func is None:
+        return
     func.__name__ = orig_func.__name__
     func.__doc__  = orig_func.__doc__
     return func
@@ -92,7 +69,7 @@ class Bunch(object):
         else:
             with p.group(4, 'Bunch(', ')'):
                 first = True
-                for k, v in sorted(list(self._mydict.iteritems())):
+                for k, v in sorted(list(self._mydict.items())):
                     if not first:
                         p.text(',')
                         p.breakable()
@@ -151,7 +128,8 @@ class Bunch(object):
 
     #TODO actually this shouldn't work at all
     for mname in _dictmethods:
-        locals()[mname] = gen_func(mname)
+        if mname not in locals():
+            locals()[mname] = gen_func(mname)
 
 
 class WriteCheckBunch(object):
@@ -231,7 +209,7 @@ class HookBunch(Bunch):
     def clear(self):
         if self.delete_hook is None:
             raise RuntimeError("Deletion not allowed (hook not defined).")
-        for k, v in self._mydict.iteritems():
+        for k, v in self._mydict.items():
             self.delete_hook(k, v)
         self._mydict.clear()
         return
@@ -273,7 +251,7 @@ class HookBunch(Bunch):
             else:
                 for k in keys():
                     self[k] = E[k]
-            for k, v in kwargs.iteritems():
+            for k, v in kwargs.items():
                 self[k] = v
             return
 

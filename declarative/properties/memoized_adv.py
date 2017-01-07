@@ -5,6 +5,7 @@ from __future__ import (
     print_function,
     absolute_import,
 )
+from builtins import object
 
 
 from ..utilities.unique import (
@@ -85,8 +86,8 @@ class MemoizedAdvDescriptor(object):
                 else:
                     result = self.fconstruct_warg(obj, result)
             except TypeError as e:
-                print ("TE:", e)
-                print("BOOBOO ON: ", obj.__class__, self.__name__)
+                print(("TE:", e))
+                print(("BOOBOO ON: ", obj.__class__, self.__name__))
                 raise
             if __debug__:
                 if result is NOARG:

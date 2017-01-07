@@ -3,6 +3,8 @@
 """
 from __future__ import division
 from __future__ import print_function
+from builtins import str
+from builtins import object
 from collections import Mapping
 
 #use local noarg to not conflict with others
@@ -178,7 +180,7 @@ class DeepBunch(object):
 
     def update_recursive(self, db = None, **kwargs):
         def recursive_op(to_db, from_db):
-            for key, val in list(from_db.iteritems()):
+            for key, val in list(from_db.items()):
                 if isinstance(val, Mapping):
                     recursive_op(to_db[key], val)
                 else:
@@ -230,7 +232,7 @@ class DeepBunch(object):
         else:
             with p.group(4, self.__class__.__name__ + '(', ')'):
                 first = True
-                for k, v in sorted(list(self._dict.iteritems())):
+                for k, v in sorted(list(self._dict.items())):
                     if not first:
                         p.text(',')
                         p.breakable()
@@ -284,7 +286,7 @@ class DeepBunch(object):
         mydict = self._resolve_dict()
         if mydict is None:
             return ()
-        return list(mydict.iterkeys())
+        return list(mydict.keys())
 
     def itervalues(self):
         mydict = self._resolve_dict()
@@ -295,7 +297,7 @@ class DeepBunch(object):
         return
 
     def values(self):
-        return list(self.itervalues())
+        return list(self.values())
 
     def iteritems(self):
         mydict = self._resolve_dict()
@@ -306,7 +308,7 @@ class DeepBunch(object):
         return
 
     def items(self):
-        return list(self.iteritems())
+        return list(self.items())
 
     def __call__(self):
         raise RuntimeError("DeepBunch cannot be called, perhaps you are trying to call a function on something which should be contained by the parent deepbunch")

@@ -5,6 +5,7 @@ from __future__ import (
     print_function,
     absolute_import,
 )
+from builtins import object
 
 
 from ..utilities.unique import (
@@ -32,7 +33,7 @@ class MemoizedGroupDescriptorBase(object):
                     try:
                         self.root._build(obj, cls)
                     except Exception as E:
-                        print("Exception in: ", self.__name__, " of: ", obj)
+                        print(("Exception in: ", self.__name__, " of: ", obj))
                         raise
                     storage = obj.__dict__[self.root]
 
@@ -43,7 +44,7 @@ class MemoizedGroupDescriptorBase(object):
                         del obj.__boot_dict__
 
                 kwargs = dict()
-                for rname, rdict in self.root.registries.iteritems():
+                for rname, rdict in self.root.registries.items():
                     val = rdict.get(self.__name__, _UNIQUE_local)
                     if val is not _UNIQUE_local:
                         kwargs[rname] = val
@@ -56,7 +57,7 @@ class MemoizedGroupDescriptorBase(object):
                         **kwargs
                     )
                 else:
-                    print(self.__name__, result)
+                    print((self.__name__, result))
                     result = self.func(
                         obj,
                         result,
@@ -180,7 +181,7 @@ class MemoizedGroupDescriptorRoot(MemoizedGroupDescriptorBase):
                     names.append(stem.format(stem = stem_fmt, name = name, **kwargs))
             principle_name = names[0]
 
-            for k, v in kwargs.iteritems():
+            for k, v in kwargs.items():
                 inner = self.registries.get(k, None)
                 if inner is None:
                     inner = dict()
@@ -241,7 +242,7 @@ class MemoizedGroupDescriptorRoot(MemoizedGroupDescriptorBase):
             )
 
             #inject the values into the boot_dict
-            for k, v in sources.iteritems():
+            for k, v in sources.items():
                 if bd is None:
                     bd = dict()
                     obj.__boot_dict__ = bd
