@@ -170,30 +170,21 @@ class ShadowBunch(object):
             ks.update(list(self._shadow_dict.keys()))
         return len(ks)
 
-    def iterkeys(self):
+    def keys(self):
         ks = set()
         for d in self._dicts:
             ks.update(list(d.keys()))
         return iter(ks)
 
-    def keys(self):
-        return list(self.keys())
-
-    def itervalues(self):
+    def values(self):
         for key in list(self.keys()):
             yield self[key]
         return
 
-    def values(self):
-        return list(self.values())
-
-    def iteritems(self):
+    def items(self):
         for key in list(self.keys()):
             yield key, self[key]
         return
-
-    def items(self):
-        return list(self.items())
 
 
 Mapping.register(ShadowBunch)

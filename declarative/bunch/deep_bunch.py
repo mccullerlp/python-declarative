@@ -276,19 +276,13 @@ class DeepBunch(object):
             del mydict[key]
         return
 
-    def iterkeys(self):
+    def keys(self):
         mydict = self._resolve_dict()
         if mydict is None:
             return iter(())
         return iter(list(mydict.keys()))
 
-    def keys(self):
-        mydict = self._resolve_dict()
-        if mydict is None:
-            return ()
-        return list(mydict.keys())
-
-    def itervalues(self):
+    def values(self):
         mydict = self._resolve_dict()
         if mydict is None:
             return
@@ -296,10 +290,7 @@ class DeepBunch(object):
             yield self[key]
         return
 
-    def values(self):
-        return list(self.values())
-
-    def iteritems(self):
+    def items(self):
         mydict = self._resolve_dict()
         if mydict is None:
             return
@@ -307,8 +298,11 @@ class DeepBunch(object):
             yield key, self[key]
         return
 
-    def items(self):
-        return list(self.items())
+    def __bool__(self):
+        mydict = self._resolve_dict()
+        if mydict is None:
+            return False
+        return bool(mydict)
 
     def __call__(self):
         raise RuntimeError("DeepBunch cannot be called, perhaps you are trying to call a function on something which should be contained by the parent deepbunch")

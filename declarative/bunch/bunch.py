@@ -8,6 +8,7 @@ import copy
 
 _dictmethods = dir(dict)
 _dictmethods.remove('__new__')
+_dictmethods.remove('__class__')
 _dictmethods.remove('__getattribute__')
 
 def gen_func(mname):
@@ -69,7 +70,7 @@ class Bunch(object):
         else:
             with p.group(4, 'Bunch(', ')'):
                 first = True
-                for k, v in sorted(list(self._mydict.items())):
+                for k, v in sorted(self._mydict.items()):
                     if not first:
                         p.text(',')
                         p.breakable()
@@ -92,7 +93,7 @@ class Bunch(object):
     def __getitem__(self, key):
         if isinstance(key, (slice, np.ndarray, MutableSequence)):
             rebuild = dict()
-            for vkey, val in list(self._mydict.items()):
+            for vkey, val in self._mydict.items():
                 if isinstance(val, np.ndarray):
                     val = val[key]
                     rebuild[vkey] = val
