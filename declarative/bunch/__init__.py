@@ -1,6 +1,7 @@
 
 from .bunch import (
     Bunch,
+    FrozenBunch,
     HookBunch,
 )
 

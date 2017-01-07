@@ -147,7 +147,60 @@ class WriteCheckBunch(object):
         return
 
 
+class FrozenBunch(Bunch):
+    """
+    """
+    def __init__(self, inner_dict = None, *args, **kwds):
+        if inner_dict is None or args or kwds:
+            if args:
+                _mydict = dict(inner_dict, *args, **kwds)
+            else:
+                _mydict = dict(**kwds)
+        else:
+            _mydict = dict(inner_dict)
+        self.__dict__['_mydict'] = _mydict
+        return
+
+    @classmethod
+    def as_bunch(cls, data):
+        if isinstance(data, cls):
+            return data
+        return cls(data)
+
+    def __hash__(self):
+        try:
+            return self.__dict__['__hash']
+        except KeyError:
+            pass
+        l = tuple(sorted(self._mydict.items()))
+        print(l)
+        self.__dict__['__hash'] = hash(l)
+        return self.__dict__['__hash']
+
+    def __pop__(self, key):
+        raise RuntimeError("Bunch is Frozen")
+
+    def __popitem__(self, key):
+        raise RuntimeError("Bunch is Frozen")
+
+    def __clear__(self, key):
+        raise RuntimeError("Bunch is Frozen")
+
+    def __setitem__(self, key, item):
+        raise RuntimeError("Bunch is Frozen")
+
+    def __setattr__(self, key, item):
+        raise RuntimeError("Bunch is Frozen")
+
+    def __delattr__(self, key):
+        raise RuntimeError("Bunch is Frozen")
+
+    def __deepcopy__(self, memo):
+        return self.__class__(copy.deepcopy(self._mydict, memo))
+
+
 Mapping.register(Bunch)
+Mapping.register(FrozenBunch)
 Mapping.register(WriteCheckBunch)
 
 class HookBunch(Bunch):
