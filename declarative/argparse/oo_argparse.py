@@ -6,20 +6,14 @@ from __future__ import (
     print_function,
     absolute_import,
 )
-from future import standard_library
-standard_library.install_aliases()
+
+import sys
 import argparse
 import collections
 
-from .. import (
-    Bunch,
-    NOARG
-)
-
-
-import sys
+from ..bunch import Bunch
 from ..overridable_object import OverridableObject
-from ..utilities.representations import SuperBase
+from ..utilities import SuperBase, NOARG
 
 
 types = Bunch(

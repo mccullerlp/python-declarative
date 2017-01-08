@@ -9,8 +9,8 @@ from builtins import object
 
 import abc
 
-from ..utilities.representations import SuperBase
-from future.utils import with_metaclass
+from ..utilities import SuperBase
+from ..utilities.future import with_metaclass
 
 
 class PropertyTransforming(with_metaclass(abc.ABCMeta, object)):
