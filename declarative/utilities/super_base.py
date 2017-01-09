@@ -12,6 +12,9 @@ from builtins import object
 class SuperBase(object):
     """
     """
+    def __new__(cls, *args, **kwargs):
+        return super(SuperBase, cls).__new__(cls)
+
     def __init__(self, **kwargs):
         super(SuperBase, self).__init__()
         if kwargs:

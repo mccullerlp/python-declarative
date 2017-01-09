@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 """
-from __future__ import (
-    division,
-    print_function,
-    absolute_import
-)
+from __future__ import division, print_function, absolute_import
 from builtins import object
 from functools import wraps
 
@@ -64,7 +60,7 @@ class ElementConstructorInternal(object):
             parent = None,
             **kwargs
     ):
-        for aname, aval in kwargs.iteritems():
+        for aname, aval in kwargs.items():
             prev = self._kwargs.setdefault(aname, aval)
             if prev != aval:
                 raise RuntimeError("Assigning Constructor item {0}, to {1}, but previously assigned {2}".format(aname, aval, prev))
@@ -76,7 +72,7 @@ class ElementConstructorInternal(object):
             parent = None,
             **kwargs
     ):
-        for aname, aval in kwargs.iteritems():
+        for aname, aval in kwargs.items():
             self._kwargs.setdefault(aname, aval)
 
     #the "None" parameters are to prevent accidental override of these from the kwargs
@@ -86,7 +82,7 @@ class ElementConstructorInternal(object):
             parent = None,
             **kwargs
     ):
-        for aname, aval in kwargs.iteritems():
+        for aname, aval in kwargs.items():
             self._kwargs[aname] = aval
 
     def construct(
@@ -248,7 +244,7 @@ class Element(
                 except KeyError:
                     arg = None
         else:
-            if isinstance(arg, (str, unicode)):
+            if isinstance(arg, str):
                 arg = self.root[arg]
             else:
                 raise NotImplementedError()
@@ -317,7 +313,7 @@ class Element(
                 self._registry_inserted[k] = v
                 #and insert
                 self.insert(obj = v, name = k)
-        for k, v in self._registry_children.iteritems():
+        for k, v in self._registry_children.items():
             v._complete()
         return False
 
@@ -332,7 +328,7 @@ class Element(
                 delattr(self, meth)
             else:
                 call(meth)
-        for cname, child in self._registry_children.iteritems():
+        for cname, child in self._registry_children.items():
             child.invalidate()
         return
 
@@ -379,7 +375,7 @@ class Element(
 
     def __dir__(self):
         directory = super(Element, self).__dir__()
-        directory.extend(self._registry_children.keys())
+        directory.extend(list(self._registry_children.keys()))
         return directory
 
     def child_register(self, name, child):
@@ -544,7 +540,7 @@ class SubElementBridge(object):
 
     def __dir__(self):
         directory = super(SubElementBridge, self).__dir__()
-        directory.extend(self._parent._registry_children.keys())
+        directory.extend(list(self._parent._registry_children.keys()))
         return directory
 
 

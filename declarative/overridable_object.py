@@ -59,10 +59,10 @@ class OverridableObject(HasDeclaritiveAttributes, SuperBase, object):
             E._tagged_already_opened_in_vim = True
             #vim_open_first_non_init()
             raise
-        self._post_init()
+        self.__post_init__()
         return
 
-    def _post_init(self):
+    def __post_init__(self):
         """
         """
         return
