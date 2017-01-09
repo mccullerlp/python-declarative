@@ -7,7 +7,11 @@ from distutils.sysconfig import get_python_lib
 from setuptools import find_packages, setup
 
 
-version = '1.0.0a1'
+version = '1.0.0dev1'
+
+
+#TODO, must warn packagers about future2.py and future3.py
+
 
 
 setup(

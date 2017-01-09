@@ -19,7 +19,13 @@ from .bases import (
     PropertyTransforming,
 )
 
+from .utilities import (
+    raise_attrerror_from_property
+)
+
+
 _UNIQUE_local = unique_generator()
+
 
 class MemoizedGroupDescriptorBase(object):
     def __get__(self, obj, cls):
@@ -32,6 +38,8 @@ class MemoizedGroupDescriptorBase(object):
                 if storage is None:
                     try:
                         self.root._build(obj, cls)
+                    except AttributeError as e:
+                        raise_attrerror_from_property(self, obj, e)
                     except Exception as E:
                         print(("Exception in: ", self.__name__, " of: ", obj))
                         raise
@@ -49,22 +57,24 @@ class MemoizedGroupDescriptorBase(object):
                     if val is not _UNIQUE_local:
                         kwargs[rname] = val
 
-                if result is _UNIQUE_local:
-                    result = self.func(
-                        obj,
-                        storage = storage,
-                        group = self.root.group,
-                        **kwargs
-                    )
-                else:
-                    print((self.__name__, result))
-                    result = self.func(
-                        obj,
-                        result,
-                        storage = storage,
-                        group = self.root.group,
-                        **kwargs
-                    )
+                try:
+                    if result is _UNIQUE_local:
+                        result = self.func(
+                            obj,
+                            storage = storage,
+                            group = self.root.group,
+                            **kwargs
+                        )
+                    else:
+                        result = self.func(
+                            obj,
+                            result,
+                            storage = storage,
+                            group = self.root.group,
+                            **kwargs
+                        )
+                except AttributeError as e:
+                    raise_attrerror_from_property(self, obj, e)
 
                 if __debug__:
                     if result is NOARG:

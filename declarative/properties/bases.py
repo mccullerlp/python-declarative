@@ -23,12 +23,21 @@ class PropertyTransforming(with_metaclass(abc.ABCMeta, object)):
         return
 
 
+#TODO rename PropertyException
 class InnerException(Exception):
     """
     Exception holder class that allows one to see inside of the functional properties when they throw and error,
     even if outer logic is catching exceptions.
 
     These should never be caught as they always indicate bugs
+    """
+    pass
+
+
+class PropertyAttributeError(Exception):
+    """
+    Exception indicating an AttributeError inside of a declarative property. AttributeError is masked so
+    that it is not confused with the property name itself being a missing attribute.
     """
     pass
 

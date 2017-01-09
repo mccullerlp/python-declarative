@@ -10,10 +10,11 @@ from .bases import (
     PropertyTransforming,
     HasDeclaritiveAttributes,
     InnerException,
+    PropertyAttributeError,
 )
 
 from .memoized import (
-    class_memoized_property,
+    memoized_class_property,
     mproperty,
     dproperty,
     mproperty_plain,

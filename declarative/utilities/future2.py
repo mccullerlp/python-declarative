@@ -49,51 +49,52 @@ Some of the functions in this module come from the following sources:
 """
 from __future__ import (absolute_import, division, print_function)
 import sys
-PY3 = sys.version_info[0] == 3
 
-if PY3:
-    from .future3 import (
-        raise_from_with_traceback,
-    )
-else:
-    from .future2 import (
-        raise_from_with_traceback,
-    )
-
-def with_metaclass(meta, *bases):
+def raise_from_with_traceback(exc, cause = None, traceback = Ellipsis):
     """
-    Function from jinja2/_compat.py (as included in python-future). License: BSD.
-    * Jinja2 (BSD licensed: see https://github.com/mitsuhiko/jinja2/blob/master/LICENSE)
+    Equivalent to:
 
-    Use it like this::
+        raise EXCEPTION from CAUSE
 
-        class BaseForm(object):
-            pass
+    on Python 3. (See PEP 3134).
 
-        class FormType(type):
-            pass
-
-        class Form(with_metaclass(FormType, BaseForm)):
-            pass
-
-    This requires a bit of explanation: the basic idea is to make a
-    dummy metaclass for one level of class instantiation that replaces
-    itself with the actual metaclass.  Because of internal type checks
-    we also need to make sure that we downgrade the custom metaclass
-    for one level to something closer to type (that's why __call__ and
-    __init__ comes back from type etc.).
-
-    This has the advantage over six.with_metaclass of not introducing
-    dummy classes into the final MRO.
+    Raise exception with existing traceback.
+    If traceback is not passed, uses sys.exc_info() to get traceback.
     """
-    class metaclass(meta):
-        __call__ = type.__call__
-        __init__ = type.__init__
+    if cause is not None:
+        # Is either arg an exception class (e.g. IndexError) rather than
+        # instance (e.g. IndexError('my message here')? If so, pass the
+        # name of the class undisturbed through to "raise ... from ...".
+        if isinstance(exc, type) and issubclass(exc, Exception):
+            e = exc()
+            # exc = exc.__name__
+            # execstr = "e = " + _repr_strip(exc) + "()"
+            # myglobals, mylocals = _get_caller_globals_and_locals()
+            # exec(execstr, myglobals, mylocals)
+        else:
+            e = exc
+        e.__suppress_context__ = False
+        if isinstance(cause, type) and issubclass(cause, Exception):
+            e.__cause__ = cause()
+            e.__suppress_context__ = True
+        elif cause is None:
+            e.__cause__ = None
+            e.__suppress_context__ = True
+        elif isinstance(cause, BaseException):
+            e.__cause__ = cause
+            e.__suppress_context__ = True
+        else:
+            raise TypeError("exception causes must derive from BaseException")
+        e.__context__ = sys.exc_info()[1]
 
-        def __new__(cls, name, this_bases, d):
-            if this_bases is None:
-                return type.__new__(cls, name, (), d)
-            return meta(name, bases, d)
-    return metaclass('temporary_class', None, {})
+    if traceback == Ellipsis:
+        _, _, traceback = sys.exc_info()
+    raise exc, None, traceback
 
+# listvalues and listitems definitions from Nick Coghlan's (withdrawn)
+# PEP 496:
+def listvalues(d):
+    return d.values()
+def listitems(d):
+    return d.items()
 

@@ -11,6 +11,7 @@ from .properties import (
     dproperty_plain,
     mfunction,
     PropertyTransforming,
+    PropertyAttributeError,
     group_dproperty,
     group_mproperty,
     mproperty_adv,
@@ -64,3 +65,4 @@ def first_non_none(*args):
 
 FNN = first_non_none
 
+PropertyAttributeError.__module__ == __name__

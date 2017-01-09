@@ -19,6 +19,11 @@ from .bases import (
     PropertyTransforming,
 )
 
+from .utilities import (
+    raise_attrerror_from_property
+)
+
+
 _UNIQUE_local = unique_generator()
 
 
@@ -89,6 +94,8 @@ class MemoizedAdvDescriptor(object):
                 print(("TE:", e))
                 print(("BOOBOO ON: ", obj.__class__, self.__name__))
                 raise
+            except AttributeError as e:
+                raise_attrerror_from_property(self, obj, e)
             if __debug__:
                 if result is NOARG:
                     raise InnerException("Return result was NOARG")
@@ -122,7 +129,10 @@ class MemoizedAdvDescriptor(object):
                 if len(args) < 3:
                     raise RuntimeError("The memoized member ({0}) does not support value exchange".format(self.__name__))
             obj.__dict__[self.__name__] = value
-            revalue = self.fsetter(obj, value, oldvalue)
+            try:
+                revalue = self.fsetter(obj, value, oldvalue)
+            except AttributeError as e:
+                raise_attrerror_from_property(self, obj, e)
             if revalue is not NOARG:
                 obj.__dict__[self.__name__] = revalue
             else:
@@ -141,7 +151,10 @@ class MemoizedAdvDescriptor(object):
                 if len(args) < 3:
                     raise RuntimeError("The memoized member ({0}) does not support value exchange".format(self.__name__))
             del obj.__dict__[self.__name__]
-            revalue = self.fdeleter(obj, oldvalue)
+            try:
+                revalue = self.fdeleter(obj, oldvalue)
+            except AttributeError as e:
+                raise_attrerror_from_property(self, obj, e)
             if revalue is not NOARG:
                 obj.__dict__[self.__name__] = revalue
         return

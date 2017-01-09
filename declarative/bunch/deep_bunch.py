@@ -179,12 +179,26 @@ class DeepBunch(object):
         return
 
     def update_recursive(self, db = None, **kwargs):
-        def recursive_op(to_db, from_db):
-            for key, val in list(from_db.items()):
-                if isinstance(val, Mapping):
-                    recursive_op(to_db[key], val)
-                else:
-                    to_db[key] = val
+        if self._vpath is None:
+            def recursive_op(to_db, from_db):
+                for key, val in list(from_db.items()):
+                    if isinstance(val, Mapping):
+                        try:
+                            rec_div = to_db[key]
+                        except KeyError:
+                            rec_div = dict()
+                        recursive_op(rec_div, val)
+                        if rec_div:
+                            to_db[key] = rec_div
+                    else:
+                        to_db[key] = val
+        else:
+            def recursive_op(to_db, from_db):
+                for key, val in list(from_db.items()):
+                    if isinstance(val, Mapping):
+                        recursive_op(to_db[key], val)
+                    else:
+                        to_db[key] = val
 
         if db is not None:
             recursive_op(self, db)

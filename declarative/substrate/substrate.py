@@ -361,7 +361,7 @@ class Element(
                     return self[name]
                 else:
                     #TODO this logic is broken for dotted indexes
-                    print("RAISING: ", repr(self), name)
+                    #print("RAISING: ", repr(self), name)
                     raise
             except KeyError as k:
                 if k.message != name:
@@ -555,8 +555,8 @@ class BuildingCounter(object):
         self.building_count -= 1
 
     def __bool__(self):
-        return self.building_count
+        return bool(self.building_count)
 
     def __nonzero__(self):
-        return self.building_count
+        return bool(self.building_count)
 

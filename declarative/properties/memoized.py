@@ -15,6 +15,10 @@ from ..utilities.unique import (
     unique_generator
 )
 
+from .utilities import (
+    raise_attrerror_from_property
+)
+
 from .bases import (
     InnerException,
     PropertyTransforming,
@@ -40,7 +44,8 @@ class ClassMemoizedDescriptor(object):
         setattr(cls, self.__name__, result)
         return result
 
-class_memoized_property = ClassMemoizedDescriptor
+
+memoized_class_property = ClassMemoizedDescriptor
 
 
 class MemoizedDescriptor(object):
@@ -60,6 +65,7 @@ class MemoizedDescriptor(object):
         declarative = None,
         transforming = None,
         simple_delete = False,
+        original_callname = None,
     ):
         self.fget = fget
         if name is None:
@@ -76,6 +82,10 @@ class MemoizedDescriptor(object):
             self.transforming = transforming
         if simple_delete:
             self.simple_delete = simple_delete
+        if original_callname is not None:
+            self.original_callname = original_callname
+        else:
+            self.original_callname = self.__class__.__name__
         return
 
     def __get__(self, obj, cls):
@@ -95,20 +105,26 @@ class MemoizedDescriptor(object):
                 else:
                     result = self.fget(obj, result)
             except TypeError as e:
+                #TODO cleanup these exceptions
                 print(("TE:", e))
                 print(("BOOBOO ON: ", obj.__class__, self.__name__))
                 raise
+            except AttributeError as e:
+                raise_attrerror_from_property(self, obj, e)
+
             if __debug__:
                 if result is NOARG:
                     raise InnerException("Return result was NOARG")
 
             if self.transforming and isinstance(result, PropertyTransforming):
                 try:
+                    print("NAME0:", self.__name__)
                     result = result.construct(
                         parent = obj,
                         name = self.__name__,
                     )
                 except Exception as E:
+                    #TODO cleanup these exceptions
                     print("BOOBOO CONSTRUCTING: {0}, in {1}".format(self.__name__, repr(self)))
                     raise
 
@@ -202,10 +218,18 @@ class MemoizedDescriptorFNoSet(object):
                 result = bd.pop(self.__name__, _UNIQUE_local)
                 if not bd:
                     del obj.__boot_dict__
-            if result is _UNIQUE_local:
-                result = self.fget(obj)
-            else:
-                result = self.fget(obj, result)
+            try:
+                if result is _UNIQUE_local:
+                    result = self.fget(obj)
+                else:
+                    result = self.fget(obj, result)
+            except TypeError as e:
+                #TODO cleanup these exceptions
+                print(("TE:", e))
+                print(("BOOBOO ON: ", obj.__class__, self.__name__))
+                raise
+            except AttributeError as e:
+                raise_attrerror_from_property(self, obj, e)
             if __debug__:
                 if result is NOARG:
                     raise InnerException("Return result was NOARG")
@@ -224,13 +248,17 @@ class MemoizedDescriptorFNoSet(object):
             result = getattr(obj, self.__name__)
         return result
 
+
 def mproperty(
         __func = None,
+        original_callname = 'mproperty',
         **kwargs
 ):
     def wrap(func):
         desc = MemoizedDescriptor(
-            func, **kwargs
+            func,
+            original_callname = original_callname,
+            **kwargs
         )
         return desc
     if __func is not None:
@@ -238,24 +266,31 @@ def mproperty(
     else:
         return wrap
 
+
 def dproperty(
         __func = None,
         declarative = True,
+        original_callname = 'dproperty',
         **kwargs
 ):
     return mproperty(
         __func = __func,
         declarative = declarative,
+        original_callname = original_callname,
         **kwargs
     )
 
+
 def mproperty_plain(
         __func = None,
+        original_callname = 'mproperty_plain',
         **kwargs
 ):
     def wrap(func):
         desc = MemoizedDescriptorFNoSet(
-            func, **kwargs
+            func,
+            original_callname = original_callname,
+            **kwargs
         )
         return desc
     if __func is not None:
@@ -263,16 +298,20 @@ def mproperty_plain(
     else:
         return wrap
 
+
 def dproperty_plain(
         __func = None,
         declarative = True,
+        original_callname = 'dproperty_plain',
         **kwargs
 ):
     return mproperty_plain(
         __func = __func,
         declarative = declarative,
+        original_callname = original_callname,
         **kwargs
     )
+
 
 if __debug__:
     mproperty_fns = mproperty
