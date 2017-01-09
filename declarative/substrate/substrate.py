@@ -555,8 +555,8 @@ class BuildingCounter(object):
         self.building_count -= 1
 
     def __bool__(self):
-        return self.building_count
+        return bool(self.building_count)
 
     def __nonzero__(self):
-        return self.building_count
+        return bool(self.building_count)
 
