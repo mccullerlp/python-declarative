@@ -60,7 +60,7 @@ class ElementConstructorInternal(object):
     #the "None" parameters are to prevent accidental override of these from the kwargs
     def adjust_safe(
             self,
-            name   = None,
+            name_child = None,
             parent = None,
             **kwargs
     ):
@@ -72,7 +72,7 @@ class ElementConstructorInternal(object):
     #the "None" parameters are to prevent accidental override of these from the kwargs
     def adjust_defer(
             self,
-            name           = None,
+            name_child   = None,
             parent = None,
             **kwargs
     ):
@@ -82,7 +82,7 @@ class ElementConstructorInternal(object):
     #the "None" parameters are to prevent accidental override of these from the kwargs
     def adjust(
             self,
-            name   = None,
+            name_child   = None,
             parent = None,
             **kwargs
     ):
@@ -363,7 +363,7 @@ class Element(
                 return self.insert(obj = item, name = name)
 
     def __getattr__(self, name):
-        #print(repr(self), name)
+        print(repr(self), name, self._registry_children)
         try:
             return super(Element, self).__getattr__(name)
         except AttributeError as E:
