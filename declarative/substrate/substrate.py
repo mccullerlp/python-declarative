@@ -25,6 +25,10 @@ from ..bunch import (
     ShadowBunch,
 )
 
+from ..utilities.future import (
+    raise_from_with_traceback,
+)
+
 if __debug__:
     mproperty_check = dproperty
 else:
@@ -111,8 +115,15 @@ class ElementConstructorInternal(object):
         except TypeError as e:
             #print("ERROR: ", e)
             #print(inst)
-            raise
+            raise_from_with_traceback(
+                BadInitCallError("Init Call for " + repr(inst.__class__.__name__) + " " + str(e)),
+                #cause = e,
+            )
         return inst
+
+
+class BadInitCallError(TypeError):
+    pass
 
 
 PropertyTransforming.register(ElementConstructorInternal)
@@ -368,6 +379,7 @@ class Element(
                     raise
                 #raise the previous exception as that one is easier to understand and may include a
                 #wider variety of issues than this final dictionary key check
+                #TODO cleanup for release
                 print(repr(self), name)
                 raise
                 raise AttributeError(k.message)

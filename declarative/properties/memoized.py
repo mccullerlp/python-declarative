@@ -118,7 +118,6 @@ class MemoizedDescriptor(object):
 
             if self.transforming and isinstance(result, PropertyTransforming):
                 try:
-                    print("NAME0:", self.__name__)
                     result = result.construct(
                         parent = obj,
                         name = self.__name__,

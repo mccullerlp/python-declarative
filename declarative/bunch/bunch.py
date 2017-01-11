@@ -13,7 +13,6 @@ _dictmethods.remove('__getattribute__')
 
 def gen_func(mname):
     def func(self, *args, **kwargs):
-        print(mname)
         return getattr(self._mydict, mname)(*args, **kwargs)
     orig_func = getattr(dict, mname)
     if orig_func is None:
@@ -173,7 +172,6 @@ class FrozenBunch(Bunch):
         except KeyError:
             pass
         l = tuple(sorted(self._mydict.items()))
-        print(l)
         self.__dict__['__hash'] = hash(l)
         return self.__dict__['__hash']
 
