@@ -31,7 +31,6 @@ class OverridableObject(HasDeclaritiveAttributes, SuperBase, object):
                     classmethod
                 )
             ):
-                #vim_open_first_non_init()
                 raise AttributeError(
                     (
                         "Can only redefine non-method descriptors, {0} a method of class {1}"
@@ -47,22 +46,18 @@ class OverridableObject(HasDeclaritiveAttributes, SuperBase, object):
             self._overridable_object_kwargs = kwargs
         kwargs_unmatched = self._overridable_object_inject(**kwargs)
         if kwargs_unmatched:
-            #vim_open_first_non_init()
             raise AttributeError(
                 (
                     "Can only redefine class-specified attributes, class {0} does not have elements {1}"
                 ).format(self.__class__.__name__, list(kwargs_unmatched.keys()))
             )
-        try:
-            super(OverridableObject, self).__init__()
-        except RuntimeError as E:
-            E._tagged_already_opened_in_vim = True
-            #vim_open_first_non_init()
-            raise
-        self.__post_init__()
+
+        #now run the __mid_init__ before all of the declarative arguments trigger
+        self.__mid_init__()
+        super(OverridableObject, self).__init__()
         return
 
-    def __post_init__(self):
+    def __mid_init__(self):
         """
         """
         return
