@@ -6,7 +6,7 @@ from __future__ import (
     print_function,
     absolute_import,
 )
-from builtins import object
+#from builtins import object
 
 
 class SuperBase(object):

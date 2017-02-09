@@ -3,8 +3,8 @@
 """
 from __future__ import division
 from __future__ import print_function
-from builtins import str
-from builtins import object
+#from builtins import str
+#from builtins import object
 from collections import Mapping
 
 #use local noarg to not conflict with others

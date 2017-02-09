@@ -5,7 +5,7 @@ from __future__ import (
     print_function,
     absolute_import,
 )
-from builtins import object
+#from builtins import object
 
 
 from ..utilities.unique import (
@@ -162,7 +162,7 @@ class MemoizedGroupDescriptorRoot(MemoizedGroupDescriptorBase):
         #TODO wrap the function call appropriately
         self.func = func
 
-    def func(self, group, storage, **kwargs):
+    def func(self, obj, group, storage, **kwargs):
         raise RuntimeError("Should specify")
         return
 

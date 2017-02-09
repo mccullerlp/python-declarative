@@ -547,7 +547,7 @@ class SubElementBridge(object):
         try:
             return self._parent[name]
         except KeyError as E:
-            raise AttributeError(E.message)
+            raise AttributeError(str(E))
 
     def __dir__(self):
         directory = super(SubElementBridge, self).__dir__()

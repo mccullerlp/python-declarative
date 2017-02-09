@@ -25,6 +25,15 @@ class RelayBoolBase(ReprMixin):
     __slots__ = ('callbacks_ontoggle', '_assign_protect')
     __repr_slots__ = ('is_set', 'name')
 
+    def __init__(self, name = '', **kwargs):
+        """
+        """
+        super(RelayBoolBase, self).__init__(**kwargs)
+        self._assign_protect = None
+        self.name = name
+        self.callbacks_ontoggle = {}
+        return
+
     @property
     def is_set(self):
         """
@@ -32,19 +41,11 @@ class RelayBoolBase(ReprMixin):
         """
         return bool(self)
 
-    def __bool__(self):
+    def __nonzero__(self):
         return self.__bool__()
 
     def __bool__(self):
         raise NotImplementedError()
-
-    def __init__(self, name = '', **kwargs):
-        """
-        """
-        super(RelayBoolBase, self).__init__(**kwargs)
-        self.name = name
-        self.callbacks_ontoggle = {}
-        return
 
     def register(
         self,
@@ -143,7 +144,7 @@ class RelayBool(RelayBoolBase):
                 for callback in list(self.callbacks_ontoggle.values()):
                     callback(self.state)
             finally:
-                del self._assign_protect
+                self._assign_protect = None
         return
 
     def assign_on(self):
@@ -161,7 +162,7 @@ class RelayBool(RelayBoolBase):
                 for callback in list(self.callbacks_ontoggle.values()):
                     callback(self.state)
             finally:
-                del self._assign_protect
+                self._assign_protect = None
         return
 
     def assign_off(self):
@@ -179,7 +180,7 @@ class RelayBool(RelayBoolBase):
                 for callback in list(self.callbacks_ontoggle.values()):
                     callback(self.state)
             finally:
-                del self._assign_protect
+                self._assign_protect = None
         return
 
     def assign_toggle(self):
@@ -195,7 +196,7 @@ class RelayBool(RelayBoolBase):
             for callback in list(self.callbacks_ontoggle.values()):
                 callback(self.state)
         finally:
-            del self._assign_protect
+            self._assign_protect = None
         return
 
 
@@ -228,7 +229,7 @@ class RelayBoolNot(RelayBoolBase):
             for callback in list(self.callbacks_ontoggle.values()):
                 callback(not value)
         finally:
-            del self._assign_protect
+            self._assign_protect = None
         return
 
     def register(
@@ -365,7 +366,7 @@ class RelayBoolGate(RelayBoolBase, ReprMixin):
                         for callback in list(self.callbacks_ontoggle.values()):
                             callback(not self._output_not)
                     finally:
-                        del self._assign_protect
+                        self._assign_protect = None
             return
 
     def bool_unregister(self, relay_bool, name = None):
@@ -393,7 +394,7 @@ class RelayBoolGate(RelayBoolBase, ReprMixin):
                         for callback in list(self.callbacks_ontoggle.values()):
                             callback(self._output_not)
                     finally:
-                        del self._assign_protect
+                        self._assign_protect = None
         return
 
     def _monitor_callback_deb(self, rbool, bname):
@@ -429,7 +430,7 @@ class RelayBoolGate(RelayBoolBase, ReprMixin):
                     for callback in list(self.callbacks_ontoggle.values()):
                         callback(not self._output_not)
                 finally:
-                    del self._assign_protect
+                    self._assign_protect = None
         else:
             self.monitored_bools_count -= 1
             if self.monitored_bools_count == 0:
@@ -441,7 +442,7 @@ class RelayBoolGate(RelayBoolBase, ReprMixin):
                     for callback in list(self.callbacks_ontoggle.values()):
                         callback(self._output_not)
                 finally:
-                    del self._assign_protect
+                    self._assign_protect = None
         return
 
     def _monitor_value_start(self):

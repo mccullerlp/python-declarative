@@ -2,9 +2,9 @@
 Requires h5py to interface
 """
 from __future__ import print_function
-from builtins import str
-from builtins import range
-from builtins import object
+#from builtins import str
+#from builtins import range
+#from builtins import object
 import h5py
 import numpy as np
 from collections import Mapping

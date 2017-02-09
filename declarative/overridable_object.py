@@ -36,7 +36,15 @@ class OverridableObject(HasDeclaritiveAttributes, SuperBase, object):
                         "Can only redefine non-method descriptors, {0} a method of class {1}"
                     ).format(key, self.__class__.__name__)
                 )
-            setattr(self, key, obj)
+            try:
+                use_bd = parent_desc._force_boot_dict
+            except AttributeError:
+                use_bd = False
+
+            if not use_bd:
+                setattr(self, key, obj)
+            else:
+                self.__boot_dict__[key] = obj
         return kwargs_unmatched
 
     def __init__(self, **kwargs):

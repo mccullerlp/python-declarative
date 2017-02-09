@@ -97,3 +97,8 @@ def with_metaclass(meta, *bases):
     return metaclass('temporary_class', None, {})
 
 
+object
+
+if PY3:
+    class object:
+        pass

@@ -5,7 +5,7 @@ from __future__ import (
     print_function,
     absolute_import,
 )
-from builtins import object
+#from builtins import object
 
 
 from functools import partial
@@ -16,7 +16,9 @@ from ..utilities.unique import (
 )
 
 from .utilities import (
-    raise_attrerror_from_property
+    raise_attrerror_from_property,
+    raise_msg_from_property,
+    try_name_file_line,
 )
 
 from .bases import (
@@ -25,6 +27,10 @@ from .bases import (
 )
 
 _UNIQUE_local = unique_generator()
+
+
+class AccessError(Exception):
+    pass
 
 
 class ClassMemoizedDescriptor(object):
@@ -99,22 +105,38 @@ class MemoizedDescriptor(object):
                 result = bd.pop(self.__name__, _UNIQUE_local)
                 if not bd:
                     del obj.__boot_dict__
-            try:
-                if result is _UNIQUE_local:
+            if result is _UNIQUE_local:
+                try:
                     result = self.fget(obj)
-                else:
+                except TypeError as e:
+                    raise_msg_from_property((
+                        "Property attribute {name} of {orepr} accessed with no initial value. Needs an initial value, or"
+                        "to be declared with a default argument at file:"
+                        "\n{filename}"
+                        "\nline {lineno}."),
+                        AccessError, self, obj, e,
+                        **try_name_file_line(self.fget)
+                    )
+                except AttributeError as e:
+                    raise_attrerror_from_property(self, obj, e)
+            else:
+                try:
                     result = self.fget(obj, result)
-            except TypeError as e:
-                #TODO cleanup these exceptions
-                print(("TE:", e))
-                print(("BOOBOO ON: ", obj.__class__, self.__name__))
-                raise
-            except AttributeError as e:
-                raise_attrerror_from_property(self, obj, e)
+                except TypeError as e:
+                    raise_msg_from_property((
+                        "Property attribute {name} of {orepr} accessed with an initial value. Needs no initial value, or"
+                        "to be declared taking an argument at file:"
+                        "\n{filename}"
+                        "\nline {lineno}."),
+                        AccessError, self, obj, e,
+                        **try_name_file_line(self.fget)
+                    )
+                except AttributeError as e:
+                    raise_attrerror_from_property(self, obj, e)
 
             if __debug__:
                 if result is NOARG:
-                    raise InnerException("Return result was NOARG")
+                    raise InnerException("Return result was NOARG (usu)")
 
             if self.transforming and isinstance(result, PropertyTransforming):
                 try:
@@ -122,10 +144,11 @@ class MemoizedDescriptor(object):
                         parent = obj,
                         name = self.__name__,
                     )
-                except Exception as E:
-                    #TODO cleanup these exceptions
-                    print("BOOBOO CONSTRUCTING: {0}, in {1}".format(self.__name__, repr(self)))
-                    raise
+                except Exception as e:
+                    raise_msg_from_property((
+                        "Property attribute {name} of {orepr} failed constructing a Transforming object"),
+                        RuntimeError, self, obj, e,
+                    )
 
             #print("SET Value for attr ({0}) in {1}".format(self.__name__, id(obj)))
             obj.__dict__[self.__name__] = result
@@ -138,20 +161,34 @@ class MemoizedDescriptor(object):
             if bd is not None:
                 oldv = bd.setdefault(self.__name__, value)
                 if oldv is not value:
-                    raise RuntimeError("Initial set on object must be unique")
+                    d = dict(
+                        name = self.__name__,
+                    )
+                    try:
+                        d['orepr'] = repr(obj)
+                    except Exception:
+                        d['orepr'] = '<object of {0}>'.format(obj.__class__.__name__)
+                    raise RuntimeError(
+                        "Initial set for attribute {name} on object {orepr} must be unique".format(**d)
+                    )
             else:
                 obj.__boot_dict__ = {self.__name__ : value}
         else:
             #the new value shows up in the object BEFORE the exchanger is called
             if oldvalue is value:
                 return
-            if __debug__:
-                import inspect
-                args, _, _, _ = inspect.getargspec(self.fget)
-                if len(args) < 3:
-                    raise RuntimeError("The memoized member ({0}) does not support value exchange".format(self.__name__))
             obj.__dict__[self.__name__] = value
-            revalue = self.fget(obj, value, oldvalue)
+            try:
+                revalue = self.fget(obj, value, oldvalue)
+            except TypeError as e:
+                raise_msg_from_property((
+                    "Property attribute {name} of {orepr} set, replacing an initial value with a new. Either setting not allowed, or"
+                    "must be declared taking 2 arguments at file:"
+                    "\n{filename}"
+                    "\nline {lineno}."),
+                    AccessError, self, obj, e,
+                    **try_name_file_line(self.fget)
+                )
             if revalue is not NOARG:
                 obj.__dict__[self.__name__] = revalue
             else:
@@ -167,13 +204,18 @@ class MemoizedDescriptor(object):
                 del obj.__dict__[self.__name__]
             else:
                 #the new value shows up in the object BEFORE the exchanger is called
-                if __debug__:
-                    import inspect
-                    args, _, _, _ = inspect.getargspec(self.fget)
-                    if len(args) < 3:
-                        raise RuntimeError("The memoized member ({0}) does not support value exchange".format(self.__name__))
                 del obj.__dict__[self.__name__]
-                revalue = self.fget(obj, NOARG, oldvalue)
+                try:
+                    revalue = self.fget(obj, NOARG, oldvalue)
+                except TypeError as e:
+                    raise_msg_from_property((
+                        "Property attribute {name} of {orepr} deleted, replacing an initial value with NOARG. Either deleting not allowed, or"
+                        "must be declared taking 2 arguments at file:"
+                        "\n{filename}"
+                        "\nline {lineno}."),
+                        AccessError, self, obj, e,
+                        **try_name_file_line(self.fget)
+                    )
                 if revalue is not NOARG:
                     obj.__dict__[self.__name__] = revalue
         return
@@ -185,6 +227,7 @@ class MemoizedDescriptorFNoSet(object):
     (and is thus only evaluated once)
     """
     _declarative_instantiation = False
+    _force_boot_dict = True
 
     def __init__(
         self,
@@ -192,6 +235,7 @@ class MemoizedDescriptorFNoSet(object):
         name = None,
         doc = None,
         declarative = None,
+        original_callname = None,
     ):
         self.fget = fget
         if name is None:
@@ -204,6 +248,10 @@ class MemoizedDescriptorFNoSet(object):
             self.__doc__ = doc
         if declarative is not None:
             self._declarative_instantiation = declarative
+        if original_callname is not None:
+            self.original_callname = original_callname
+        else:
+            self.original_callname = self.__class__.__name__
         return
 
     def __get__(self, obj, cls):
@@ -217,18 +265,35 @@ class MemoizedDescriptorFNoSet(object):
                 result = bd.pop(self.__name__, _UNIQUE_local)
                 if not bd:
                     del obj.__boot_dict__
-            try:
-                if result is _UNIQUE_local:
+            if result is _UNIQUE_local:
+                try:
                     result = self.fget(obj)
-                else:
+                except TypeError as e:
+                    raise_msg_from_property((
+                        "Property attribute {name} of {orepr} accessed with no initial value. Needs an initial value, or"
+                        "to be declared with a default argument at file:"
+                        "\n{filename}"
+                        "\nline {lineno}."),
+                        AccessError, self, obj, e,
+                        **try_name_file_line(self.fget)
+                    )
+                except AttributeError as e:
+                    raise_attrerror_from_property(self, obj, e)
+            else:
+                try:
                     result = self.fget(obj, result)
-            except TypeError as e:
-                #TODO cleanup these exceptions
-                print(("TE:", e))
-                print(("BOOBOO ON: ", obj.__class__, self.__name__))
-                raise
-            except AttributeError as e:
-                raise_attrerror_from_property(self, obj, e)
+                except TypeError as e:
+                    raise_msg_from_property((
+                        "Property attribute {name} of {orepr} accessed with an initial value. Needs no initial value, or"
+                        "to be declared taking an argument at file:"
+                        "\n{filename}"
+                        "\nline {lineno}."),
+                        AccessError, self, obj, e,
+                        **try_name_file_line(self.fget)
+                    )
+                except AttributeError as e:
+                    raise_attrerror_from_property(self, obj, e)
+
             if __debug__:
                 if result is NOARG:
                     raise InnerException("Return result was NOARG")
