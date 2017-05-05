@@ -30,6 +30,8 @@ from .memoized_adv import (
 )
 
 from .memoized_adv_group import (
+    dproperty_adv_group,
+    mproperty_adv_group,
     group_mproperty,
     group_dproperty,
 )

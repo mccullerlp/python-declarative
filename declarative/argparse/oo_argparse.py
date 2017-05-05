@@ -14,6 +14,7 @@ import collections
 from ..bunch import Bunch
 from ..overridable_object import OverridableObject
 from ..utilities import SuperBase, NOARG
+from ..properties import mproperty
 
 
 types = Bunch(
@@ -23,9 +24,19 @@ types = Bunch(
 )
 
 
-class OOArgParse(OverridableObject, SuperBase, object):
+class OOArgParse(
+        OverridableObject,
+        SuperBase,
+        object,
+):
     @classmethod
-    def __cls_argparse__(cls, args = None):
+    def __cls_argparse__(
+            cls,
+            args = None,
+            __sys_exit = True,
+            __usage_prog__ = None,
+            **exkwargs
+    ):
         arguments = dict()
         commands  = dict()
         groups    = dict()
@@ -34,7 +45,9 @@ class OOArgParse(OverridableObject, SuperBase, object):
             arganno = getattr(attr_obj, '_argparse', None)
             if arganno:
                 if arganno.type == types.argument:
-                    arguments[attr_name] = arganno
+                    #mask the argument if it was specified in an extra kwarg
+                    if attr_name not in exkwargs:
+                        arguments[attr_name] = arganno
                 elif arganno.type == types.group:
                     groups[attr_name] = arganno
                 elif arganno.type == types.command:
@@ -43,6 +56,7 @@ class OOArgParse(OverridableObject, SuperBase, object):
         description = getattr(cls, "__arg_desc__", cls.__doc__)
 
         ap = argparse.ArgumentParser(
+            prog        = __usage_prog__,
             description = description,
             add_help    = False
         )
@@ -159,10 +173,18 @@ class OOArgParse(OverridableObject, SuperBase, object):
 
         if commands_byname:
             command = getattr(args_parsed, '__command__', NOARG)
+            command_idx_in_args = args.index(command)
+            call_args = args[:command_idx_in_args]
         else:
             command = None
+            call_args = args
         args    = getattr(args_parsed, '__args__', NOARG)
 
+        #add in the extra kwargs that were given
+        kwargs.update(exkwargs)
+        kwargs['__cls_argparse_args__'] = tuple(call_args)
+        kwargs['__cls_argparse_cmd__']  = command
+        kwargs['__cls_argparse_cmd_args__']  = tuple(call_args) if call_args is not NOARG else None
         obj = cls(**kwargs)
 
         if command is None:
@@ -171,5 +193,18 @@ class OOArgParse(OverridableObject, SuperBase, object):
             cbunch = commands_byname[command]
             call = getattr(obj, cbunch.run_name)
             ret = call(args)
+        if __sys_exit:
+            sys.exit(ret)
         return ret
 
+    @mproperty
+    def __cls_argparse_args__(self, args = None):
+        return args
+
+    @mproperty
+    def __cls_argparse_cmd__(self, args = None):
+        return args
+
+    @mproperty
+    def __cls_argparse_cmd_args__(self, args = None):
+        return args

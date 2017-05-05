@@ -16,6 +16,8 @@ from .properties import (
     group_mproperty,
     mproperty_adv,
     dproperty_adv,
+    mproperty_adv_group,
+    dproperty_adv_group,
 )
 
 from .callbacks import (

@@ -109,28 +109,32 @@ class MemoizedDescriptor(object):
                 try:
                     result = self.fget(obj)
                 except TypeError as e:
-                    raise_msg_from_property((
-                        "Property attribute {name} of {orepr} accessed with no initial value. Needs an initial value, or"
-                        "to be declared with a default argument at file:"
-                        "\n{filename}"
-                        "\nline {lineno}."),
+                    raise_msg_from_property(
+                        ("Property attribute {name} of {orepr} accessed with no initial value. Needs an initial value, or"
+                         " to be declared with a default argument at file:"
+                         "\n{filename}"
+                         "\nline {lineno}."),
                         AccessError, self, obj, e,
+                        if_from_file = __file__,
                         **try_name_file_line(self.fget)
                     )
+                    raise
                 except AttributeError as e:
                     raise_attrerror_from_property(self, obj, e)
             else:
                 try:
                     result = self.fget(obj, result)
                 except TypeError as e:
-                    raise_msg_from_property((
-                        "Property attribute {name} of {orepr} accessed with an initial value. Needs no initial value, or"
-                        "to be declared taking an argument at file:"
-                        "\n{filename}"
-                        "\nline {lineno}."),
+                    raise_msg_from_property(
+                        ("Property attribute {name} of {orepr} accessed with an initial value. Needs no initial value, or"
+                         "to be declared taking an argument at file:"
+                         "\n{filename}"
+                         "\nline {lineno}."),
                         AccessError, self, obj, e,
+                        if_from_file = __file__,
                         **try_name_file_line(self.fget)
                     )
+                    raise
                 except AttributeError as e:
                     raise_attrerror_from_property(self, obj, e)
 
@@ -145,6 +149,7 @@ class MemoizedDescriptor(object):
                         name = self.__name__,
                     )
                 except Exception as e:
+                    raise
                     raise_msg_from_property((
                         "Property attribute {name} of {orepr} failed constructing a Transforming object"),
                         RuntimeError, self, obj, e,
@@ -181,14 +186,16 @@ class MemoizedDescriptor(object):
             try:
                 revalue = self.fget(obj, value, oldvalue)
             except TypeError as e:
-                raise_msg_from_property((
-                    "Property attribute {name} of {orepr} set, replacing an initial value with a new. Either setting not allowed, or"
-                    "must be declared taking 2 arguments at file:"
-                    "\n{filename}"
-                    "\nline {lineno}."),
+                raise_msg_from_property(
+                    ("Property attribute {name} of {orepr} set, replacing an initial value with a new. Either setting not allowed, or"
+                     "must be declared taking 2 arguments at file:"
+                     "\n{filename}"
+                     "\nline {lineno}."),
                     AccessError, self, obj, e,
+                    if_from_file = __file__,
                     **try_name_file_line(self.fget)
                 )
+                raise
             if revalue is not NOARG:
                 obj.__dict__[self.__name__] = revalue
             else:
@@ -208,14 +215,16 @@ class MemoizedDescriptor(object):
                 try:
                     revalue = self.fget(obj, NOARG, oldvalue)
                 except TypeError as e:
-                    raise_msg_from_property((
-                        "Property attribute {name} of {orepr} deleted, replacing an initial value with NOARG. Either deleting not allowed, or"
-                        "must be declared taking 2 arguments at file:"
-                        "\n{filename}"
-                        "\nline {lineno}."),
+                    raise_msg_from_property(
+                        ("Property attribute {name} of {orepr} deleted, replacing an initial value with NOARG. Either deleting not allowed, or"
+                         "must be declared taking 2 arguments at file:"
+                         "\n{filename}"
+                         "\nline {lineno}."),
                         AccessError, self, obj, e,
+                        if_from_file = __file__,
                         **try_name_file_line(self.fget)
                     )
+                    raise
                 if revalue is not NOARG:
                     obj.__dict__[self.__name__] = revalue
         return
@@ -269,28 +278,32 @@ class MemoizedDescriptorFNoSet(object):
                 try:
                     result = self.fget(obj)
                 except TypeError as e:
-                    raise_msg_from_property((
-                        "Property attribute {name} of {orepr} accessed with no initial value. Needs an initial value, or"
-                        "to be declared with a default argument at file:"
-                        "\n{filename}"
-                        "\nline {lineno}."),
+                    raise_msg_from_property(
+                        ("Property attribute {name} of {orepr} accessed with no initial value. Needs an initial value, or"
+                         "to be declared with a default argument at file:"
+                         "\n{filename}"
+                         "\nline {lineno}."),
                         AccessError, self, obj, e,
+                        if_from_file = __file__,
                         **try_name_file_line(self.fget)
                     )
+                    raise
                 except AttributeError as e:
                     raise_attrerror_from_property(self, obj, e)
             else:
                 try:
                     result = self.fget(obj, result)
                 except TypeError as e:
-                    raise_msg_from_property((
-                        "Property attribute {name} of {orepr} accessed with an initial value. Needs no initial value, or"
-                        "to be declared taking an argument at file:"
-                        "\n{filename}"
-                        "\nline {lineno}."),
+                    raise_msg_from_property(
+                        ("Property attribute {name} of {orepr} accessed with an initial value. Needs no initial value, or"
+                         "to be declared taking an argument at file:"
+                         "\n{filename}"
+                         "\nline {lineno}."),
                         AccessError, self, obj, e,
+                        if_from_file = __file__,
                         **try_name_file_line(self.fget)
                     )
+                    raise
                 except AttributeError as e:
                     raise_attrerror_from_property(self, obj, e)
 

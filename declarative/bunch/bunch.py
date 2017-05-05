@@ -6,10 +6,18 @@ from collections import Mapping, MutableSequence
 import numpy as np
 import copy
 
+def try_remove(d, o):
+    try:
+        d.remove(o)
+    except ValueError:
+        pass
+
+
 _dictmethods = dir(dict)
 _dictmethods.remove('__new__')
 _dictmethods.remove('__class__')
 _dictmethods.remove('__getattribute__')
+try_remove(_dictmethods, '__init_subclass__')
 
 def gen_func(mname):
     def func(self, *args, **kwargs):

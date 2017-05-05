@@ -5,6 +5,7 @@ from __future__ import (
     print_function,
     absolute_import,
 )
+import traceback as tb_mod
 import sys
 
 from .bases import (
@@ -43,16 +44,20 @@ def try_name_file_line(func):
         d['filename'] = '<unknown>'
 
     try:
-        d['lineno'] = func.__code__.co_firstlineno,
+        d['lineno'] = func.__code__.co_firstlineno
     except Exception:
-        d['lineno'] = '<unknown>',
+        d['lineno'] = '<unknown>'
     return d
 
 
-def raise_msg_from_property(msg, t_exc, prop, obj, oldexc = None, **kwargs):
+def raise_msg_from_property(msg, t_exc, prop, obj, old_exc = None, if_from_file = None, **kwargs):
     """
     """
     _, _, traceback = sys.exc_info()
+    #print("FILE FROM: ", tb_mod.extract_tb(traceback)[-1][0])
+    #raise
+    if if_from_file is not None and (tb_mod.extract_tb(traceback)[-1][0] != if_from_file):
+        return False
     d = dict(
         name = prop.__name__
     )
@@ -66,6 +71,6 @@ def raise_msg_from_property(msg, t_exc, prop, obj, oldexc = None, **kwargs):
 
     raise_from_with_traceback(
         t_exc(msg),
-        cause = oldexc,
+        cause = old_exc,
         traceback = traceback,
     )

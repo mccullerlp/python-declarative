@@ -20,9 +20,12 @@ from .bases import (
 )
 
 from .utilities import (
-    raise_attrerror_from_property
+    raise_attrerror_from_property,
+    raise_msg_from_property,
+    try_name_file_line,
 )
 
+from .memoized import AccessError
 
 _UNIQUE_local = unique_generator()
 
@@ -75,39 +78,63 @@ class MemoizedAdvDescriptor(object):
         raise RuntimeError("Deleting not supported on {0}".self(__name__))
 
     def __get__(self, obj, cls):
-        if obj is None:
-            return self
-        result = obj.__dict__.get(self.__name__, _UNIQUE_local)
-        if result is _UNIQUE_local:
-            #bd = obj.__boot_dict__
-            bd = getattr(obj, '__boot_dict__', None)
-            if bd is not None:
-                result = bd.pop(self.__name__, _UNIQUE_local)
-                if not bd:
-                    del obj.__boot_dict__
-            try:
+        try:
+            if obj is None:
+                return self
+            result = obj.__dict__.get(self.__name__, _UNIQUE_local)
+            if result is _UNIQUE_local:
+                #bd = obj.__boot_dict__
+                bd = getattr(obj, '__boot_dict__', None)
+                if bd is not None:
+                    result = bd.pop(self.__name__, _UNIQUE_local)
+                    if not bd:
+                        del obj.__boot_dict__
                 if result is _UNIQUE_local:
-                    result = self.fconstruct_narg(obj)
+                    try:
+                        result = self.fconstruct_narg(obj)
+                    except TypeError as e:
+                        raise_msg_from_property(
+                            ("Property attribute {name} of {orepr} accessed with no initial value. Needs an initial value, or"
+                             " to be declared with a default argument at file:"
+                             "\n{filename}"
+                             "\nline {lineno}."),
+                            AccessError, self, obj, e,
+                            if_from_file = __file__,
+                            **try_name_file_line(self.fconstruct_narg)
+                        )
+                        raise
+                    except AttributeError as e:
+                        raise_attrerror_from_property(self, obj, e)
                 else:
-                    result = self.fconstruct_warg(obj, result)
-            except TypeError as e:
-                print(("TE:", e))
-                print(("BOOBOO ON: ", obj.__class__, self.__name__))
-                raise
-            except AttributeError as e:
-                raise_attrerror_from_property(self, obj, e)
-            if __debug__:
-                if result is NOARG:
-                    raise InnerException("Return result was NOARG")
+                    try:
+                        result = self.fconstruct_warg(obj, result)
+                    except TypeError as e:
+                        raise_msg_from_property(
+                            ("Property attribute {name} of {orepr} accessed with no initial value. Needs an initial value, or"
+                             " to be declared with a default argument at file:"
+                             "\n{filename}"
+                             "\nline {lineno}."),
+                            AccessError, self, obj, e,
+                            if_from_file = __file__,
+                            **try_name_file_line(self.fconstruct_warg)
+                        )
+                        raise
+                    except AttributeError as e:
+                        raise_attrerror_from_property(self, obj, e)
+                if __debug__:
+                    if result is NOARG:
+                        raise InnerException("Return result was NOARG")
 
-            if self.transforming and isinstance(result, PropertyTransforming):
-                result = result.construct(
-                    parent = obj,
-                    name = self.__name__,
-                )
+                if isinstance(result, PropertyTransforming):
+                    result = result.construct(
+                        parent = obj,
+                        name = self.__name__,
+                    )
 
-            obj.__dict__[self.__name__] = result
-        return result
+                obj.__dict__[self.__name__] = result
+            return result
+        except AttributeError as e:
+            raise RuntimeError(e)
 
     def __set__(self, obj, value):
         oldvalue = obj.__dict__.get(self.__name__, _UNIQUE_local)
@@ -158,7 +185,6 @@ class MemoizedAdvDescriptor(object):
             if revalue is not NOARG:
                 obj.__dict__[self.__name__] = revalue
         return
-
 
 
 def mproperty_adv(

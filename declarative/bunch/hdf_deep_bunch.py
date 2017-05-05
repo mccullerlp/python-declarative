@@ -41,11 +41,11 @@ class HDFDeepBunch(object):
         self,
         hdf = None,
         vpath = None,
-        writable = False,
+        writeable = False,
         overwrite = False,
     ):
         if isinstance(hdf, str):
-            if writable:
+            if writeable:
                 hdf = h5py.File(hdf, 'a')
                 if vpath is None:
                     vpath = True
@@ -189,7 +189,7 @@ class HDFDeepBunch(object):
             return super(HDFDeepBunch, self).__setattr__(key, item)
         return self.__setitem__(key, item)
 
-    def update_from_dict_recursive(
+    def update_recursive(
         self,
         data_dict,
         groups_overwrite  = False,
@@ -366,19 +366,13 @@ class HDFDeepBunch(object):
             del hdf[key]
         return
 
-    def iterkeys(self):
+    def keys(self):
         hdf = self._resolve_hdf()
         if hdf is None:
             return iter(())
         return iter(list(hdf.keys()))
 
-    def keys(self):
-        hdf = self._resolve_hdf()
-        if hdf is None:
-            return ()
-        return list(hdf.keys())
-
-    def itervalues(self):
+    def values(self):
         hdf = self._resolve_hdf()
         if hdf is None:
             return
@@ -386,18 +380,12 @@ class HDFDeepBunch(object):
             yield self[key]
         return
 
-    def values(self):
-        return list(self.values())
-
-    def iteritems(self):
+    def items(self):
         hdf = self._resolve_hdf()
         if hdf is None:
             return
         for key in list(hdf.keys()):
             yield key, self[key]
         return
-
-    def items(self):
-        return list(self.items())
 
 Mapping.register(HDFDeepBunch)

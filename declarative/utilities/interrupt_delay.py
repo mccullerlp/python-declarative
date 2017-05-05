@@ -1,6 +1,5 @@
 """
 """
-from builtins import object
 import signal
 import logging
 

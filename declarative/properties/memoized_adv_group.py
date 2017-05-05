@@ -163,11 +163,15 @@ class MemoizedGroupDescriptorRoot(MemoizedGroupDescriptorBase):
         self.func = func
 
     def func(self, obj, group, storage, **kwargs):
-        raise RuntimeError("Should specify")
-        return
+        return None
+        #raise RuntimeError("Should specify")
+        #return
 
     def __generate_virtual_descriptors__(self):
         return self.group
+
+    def name_change(self, name):
+        self.__name__ = name
 
     def mproperty(
             self,
@@ -305,7 +309,7 @@ class MemoizedGroupDescriptor(MemoizedGroupDescriptorBase):
         return
 
 
-def group_mproperty(
+def mproperty_adv_group(
         __func = None,
         **kwargs
 ):
@@ -320,14 +324,16 @@ def group_mproperty(
         return wrap
 
 
-def group_dproperty(
+def dproperty_adv_group(
         __func = None,
         declarative = True,
         **kwargs
 ):
-    return group_mproperty(
+    return mproperty_adv_group(
         __func = __func,
         declarative = declarative,
         **kwargs
     )
 
+group_dproperty = dproperty_adv_group
+group_mproperty = mproperty_adv_group

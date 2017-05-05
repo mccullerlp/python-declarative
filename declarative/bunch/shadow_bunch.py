@@ -4,7 +4,8 @@
 from collections import Mapping
 from numbers import Number
 
-from ..utilities.unique import NOARG
+from ..utilities.unique import unique_generator
+NOARG = unique_generator()
 
 
 class ShadowBunch(object):
@@ -58,6 +59,11 @@ class ShadowBunch(object):
             self._dicts,
             assign_idx = idx,
         )
+
+    def extractidx(self, idx):
+        if not isinstance(idx, Number):
+            idx = self._names[idx]
+        return self._dicts[idx]
 
     def __getattr__(self, key):
         try:
@@ -126,11 +132,12 @@ class ShadowBunch(object):
     def has_key(self, key):
         return key in self
 
-    #def __dir__(self):
-    #    items = list(super(ShadowBunch, self).__dir__())
-    #    #for d in self._dicts:
-    #        #items += list(d.keys())
-    #    return items
+    def __dir__(self):
+        items = list(super(ShadowBunch, self).__dir__())
+        for d in self._dicts:
+            items.extend(d.keys())
+        items.sort()
+        return items
 
     def __repr__(self):
         return (
@@ -162,27 +169,34 @@ class ShadowBunch(object):
     #    return not (self == other)
 
     def __iter__(self):
-        return iter(list(self.keys()))
+        return iter(self.keys())
 
     def __len__(self):
         ks = set()
         for d in self._dicts:
-            ks.update(list(self._shadow_dict.keys()))
+            ks.update(d.keys())
         return len(ks)
+
+    def __bool__(self):
+        for d in self._dicts:
+            if d:
+                return True
+        else:
+            return False
 
     def keys(self):
         ks = set()
         for d in self._dicts:
-            ks.update(list(d.keys()))
+            ks.update(d.keys())
         return iter(ks)
 
     def values(self):
-        for key in list(self.keys()):
+        for key in self.keys():
             yield self[key]
         return
 
     def items(self):
-        for key in list(self.keys()):
+        for key in self.keys():
             yield key, self[key]
         return
 
