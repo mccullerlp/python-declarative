@@ -23,7 +23,6 @@ try_remove(_dictmethods, '__init_subclass__')
 def gen_func(mname):
     def func(self, *args, **kwargs):
         return getattr(self._mydict, mname)(*args, **kwargs)
-    print(mname)
     orig_func = getattr(dict, mname)
     if orig_func is None:
         return
