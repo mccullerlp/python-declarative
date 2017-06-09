@@ -183,7 +183,7 @@ See the Bunch page for more.
 A number of objects are provided for reactor programming. These are RelayValue and RelayBool which store values and run callbacks upon their change. This is similar Qt's signal/socket programming but lightweight for python.
 
 ### Substrate System
-This is the culmination of the declarative techniques to hierarchical simulation and modeling. Child objects automatically embed into parent objects and gain access to nonlocal data and registration interfaces. It invokes considerably more "magic" than this library typically need. Currently used by the python physics/controls simulation software OpenLoop.
+This is the culmination of the declarative techniques to hierarchical simulation and modeling. Child objects automatically embed into parent objects and gain access to nonlocal data and registration interfaces. It invokes considerably more "magic" than this library typically need. Currently used by the python physics/controls simulation software openLoop.
 
 ## Development
 This library was developed in initial form to generate the Control System and interfaces of the Holometer experiment at Fermilab. The underlying technology for that is the EPICS distributed experimental control library (developed at Argonne). 

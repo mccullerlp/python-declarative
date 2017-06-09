@@ -13,12 +13,11 @@ def try_remove(d, o):
     except ValueError:
         pass
 
-
 _dictmethods = dir(dict)
-_dictmethods.remove('__new__')
-_dictmethods.remove('__class__')
-_dictmethods.remove('__dict__')
-_dictmethods.remove('__getattribute__')
+try_remove(_dictmethods, '__new__')
+try_remove(_dictmethods, '__class__')
+try_remove(_dictmethods, '__dict__')
+try_remove(_dictmethods, '__getattribute__')
 try_remove(_dictmethods, '__init_subclass__')
 
 def gen_func(mname):

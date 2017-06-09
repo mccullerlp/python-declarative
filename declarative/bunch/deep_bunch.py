@@ -332,7 +332,7 @@ class DeepBunchSingleAssign(DeepBunch):
         except TypeError:
             raise TypeError("Can't insert {0} into {1} at key {2}".format(item, mydict, key))
 
-    #def ooa_through(self, obj, **kwargs):
+    #def ctree_through(self, obj, **kwargs):
     #    for k, v in kwargs.iteritems():
     #        self[k] = v
     #        setattr(obj, k, self[k])
