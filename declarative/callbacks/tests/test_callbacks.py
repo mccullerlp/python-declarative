@@ -1,7 +1,7 @@
 """
 """
 from __future__ import (division, print_function, absolute_import)
-from builtins import object
+#from builtins import object
 
 from declarative.callbacks import (Callback, callbackmethod)
 

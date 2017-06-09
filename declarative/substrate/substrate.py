@@ -2,7 +2,7 @@
 """
 """
 from __future__ import division, print_function, absolute_import
-from builtins import object
+#from builtins import object
 from functools import wraps
 
 from ..properties import (
