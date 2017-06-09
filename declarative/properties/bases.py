@@ -10,7 +10,7 @@ from __future__ import (
 import abc
 
 from ..utilities import SuperBase
-from ..utilities.future import with_metaclass
+from ..utilities.future_from_2 import with_metaclass
 
 
 class PropertyTransforming(with_metaclass(abc.ABCMeta, object)):

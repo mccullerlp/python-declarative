@@ -26,7 +26,7 @@ from ..bunch import (
     ShadowBunch,
 )
 
-from ..utilities.future import (
+from ..utilities.future_from_2 import (
     raise_from_with_traceback,
 )
 

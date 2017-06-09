@@ -1,7 +1,8 @@
 """
 """
-#from builtins import str
-#from builtins import object
+from __future__ import (division, print_function, unicode_literals)
+from ..utilities.future_from_2 import str, object, dict
+
 from collections import Mapping, MutableSequence
 import numpy as np
 import copy
@@ -16,12 +17,14 @@ def try_remove(d, o):
 _dictmethods = dir(dict)
 _dictmethods.remove('__new__')
 _dictmethods.remove('__class__')
+_dictmethods.remove('__dict__')
 _dictmethods.remove('__getattribute__')
 try_remove(_dictmethods, '__init_subclass__')
 
 def gen_func(mname):
     def func(self, *args, **kwargs):
         return getattr(self._mydict, mname)(*args, **kwargs)
+    print(mname)
     orig_func = getattr(dict, mname)
     if orig_func is None:
         return

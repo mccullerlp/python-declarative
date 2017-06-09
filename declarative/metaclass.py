@@ -4,7 +4,7 @@
 from __future__ import division, print_function
 #from builtins import object
 import warnings
-from .utilities.future import with_metaclass
+from .utilities.future_from_2 import with_metaclass
 
 
 class AutodecorateMeta(type):
