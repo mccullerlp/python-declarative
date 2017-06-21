@@ -523,6 +523,8 @@ class RootElement(Element):
         full = DeepBunchSingleAssign()
         immed = DeepBunchSingleAssign()
         dicts = [full, immed, ]
+
+        #add in the argument one as the last
         if arg is not NOARG:
             dicts.append(arg)
         return ShadowBunchN(dicts)

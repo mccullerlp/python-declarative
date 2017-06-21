@@ -60,10 +60,15 @@ class ShadowBunch(object):
             assign_idx = idx,
         )
 
-    def extractidx(self, idx):
+    def extractidx(self, idx, default = NOARG):
         if not isinstance(idx, Number):
             idx = self._names[idx]
-        return self._dicts[idx]
+        try:
+            return self._dicts[idx]
+        except IndexError:
+            if default is NOARG:
+                raise
+            return default
 
     def __getattr__(self, key):
         try:

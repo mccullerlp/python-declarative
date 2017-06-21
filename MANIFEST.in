@@ -1,6 +1,7 @@
 include LICENSE
 include README.rst
 include README.md
+include README.ipynb
 include MANIFEST.in
 include setup.cfg
 include setup.py
