@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 """
-from __future__ import division
-from __future__ import print_function
-#from builtins import str
-#from builtins import object
+from __future__ import division, print_function, unicode_literals
+from ..utilities.future_from_2 import repr_compat, object, str
 from collections import Mapping
 
 #use local noarg to not conflict with others
@@ -219,6 +217,7 @@ class DeepBunch(object):
         #items += dir(super(Bunch, self))
         return items
 
+    @repr_compat
     def __repr__(self):
         if self._vpath is None:
             vpath = 'False'

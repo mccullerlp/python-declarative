@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 """
-#from builtins import object
 from collections import Mapping
-
+from ..utilities.future_from_2 import str, object, repr_compat
 from ..utilities.unique import NOARG
+
 from .deep_bunch import DeepBunch
 
 
@@ -120,6 +120,7 @@ class TagBunch(object):
         #items += dir(super(Bunch, self))
         return items
 
+    @repr_compat
     def __repr__(self):
         return (
             '{0}({1}, {2})'

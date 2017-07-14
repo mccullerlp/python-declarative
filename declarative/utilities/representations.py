@@ -5,6 +5,7 @@
 .. autofunction:: bool_string_interpret
 """
 from __future__ import division, print_function, unicode_literals
+from ..utilities.future_from_2 import repr_compat
 from .super_base import SuperBase
 
 
@@ -28,6 +29,7 @@ class ReprMixin(SuperBase):
     __slots__      = ()
     __repr_slots__ = ()
 
+    @repr_compat
     def __repr__(self):
         attr_names = []
         attr_names_set = set()

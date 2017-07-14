@@ -3,9 +3,7 @@
 Requires h5py to interface
 """
 from __future__ import print_function
-#from builtins import str
-#from builtins import range
-#from builtins import object
+from ..utilities.future_from_2 import repr_compat
 import h5py
 import numpy as np
 from collections import Mapping
@@ -331,6 +329,7 @@ class HDFDeepBunch(object):
         #items += dir(super(Bunch, self))
         return items
 
+    @repr_compat
     def __repr__(self):
         if self._vpath is None:
             vpath = 'False'

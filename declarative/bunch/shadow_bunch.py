@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 """
-#from builtins import object
 from collections import Mapping
 from numbers import Number
+from ..utilities.future_from_2 import repr_compat
 
 from ..utilities.unique import unique_generator
 NOARG = unique_generator()
@@ -145,6 +145,7 @@ class ShadowBunch(object):
         items.sort()
         return items
 
+    @repr_compat
     def __repr__(self):
         return (
             '{0}({1}, idx={2})'
