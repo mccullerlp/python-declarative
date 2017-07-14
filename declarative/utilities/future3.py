@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 TODO: get licences from python-future
 A selection of cross-compatible functions for Python 2 and 3.

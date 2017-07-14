@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 """
 #make noarg a VERY unique value. Was using empty tuple, but python caches it, this should be quite unique

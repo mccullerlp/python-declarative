@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Pulls in the future library requirement if running on python2
 """

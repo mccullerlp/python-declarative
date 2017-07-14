@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Requires h5py to interface
 """

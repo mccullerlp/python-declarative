@@ -1,15 +1,10 @@
-#!/usr/bin/python2
+# -*- coding: utf-8 -*-
 """
 .. autoclass:: ReprMixin
 
 .. autofunction:: bool_string_interpret
 """
-from __future__ import (
-    division,
-    print_function,
-    absolute_import,
-)
-
+from __future__ import division, print_function, unicode_literals
 from .super_base import SuperBase
 
 
