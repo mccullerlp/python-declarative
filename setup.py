@@ -8,12 +8,14 @@ from distutils.sysconfig import get_python_lib
 from setuptools import find_packages, setup
 
 
-version = '1.0.0.dev2'
+version = '1.0.0.dev3'
 
 
 #TODO, must warn packagers about future2.py and future3.py
 
-
+extra_install_requires = []
+if sys.version_info < (3,0):
+    extra_install_requires.append('future')
 
 setup(
     name='declarative',
@@ -30,7 +32,8 @@ setup(
     #include_package_data=True,
     #scripts=[''],
     #entry_points={'console_scripts': ['',]},
-    install_requires=[],
+    install_requires=[
+    ] + extra_install_requires,
     extras_require={
         "hdf" : ["h5py"],
         "test" : ["pytest"],
