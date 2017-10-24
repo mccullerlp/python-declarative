@@ -36,6 +36,8 @@ class OOArgParse(
             args = None,
             __sys_exit = True,
             __usage_prog__ = None,
+            base_kwargs = dict(),
+            no_commands = False,
             **exkwargs
     ):
         arguments = dict()
@@ -93,31 +95,32 @@ class OOArgParse(
 
         cmdlist = list(k for o, k in sorted((v.order, k) for k, v in commands_byname.items()))
 
-        if default_cmd is None:
-            ap.add_argument(
-                '__command__',
-                metavar = 'COMMAND',
-                choices = cmdlist,
-                help = argparse.SUPPRESS,
-            )
-        else:
-            if commands_byname:
+        if not no_commands:
+            if default_cmd is None:
                 ap.add_argument(
                     '__command__',
                     metavar = 'COMMAND',
-                    choices = cmdlist + [""],
-                    default = None,
-                    nargs='?',
+                    choices = cmdlist,
                     help = argparse.SUPPRESS,
                 )
+            else:
+                if commands_byname:
+                    ap.add_argument(
+                        '__command__',
+                        metavar = 'COMMAND',
+                        choices = cmdlist + [""],
+                        default = None,
+                        nargs='?',
+                        help = argparse.SUPPRESS,
+                    )
 
-        if len(commands_byname) > 0:
-            ap.add_argument(
-                '__args__',
-                metavar = 'args',
-                nargs=argparse.REMAINDER,
-                help = argparse.SUPPRESS,
-            )
+            if len(commands_byname) > 0:
+                ap.add_argument(
+                    '__args__',
+                    metavar = 'args',
+                    nargs=argparse.REMAINDER,
+                    help = argparse.SUPPRESS,
+                )
 
         argdo = dict()
         for order, argname, argbunch in sorted([(v.order, k, v) for k, v in arguments.items()]):
@@ -157,22 +160,23 @@ class OOArgParse(
                     help = doc,
                 )
 
-            for name, cbunch in commands.items():
-                commands_byname[cbunch.cmd_name] = cbunch
-                spp.add_parser(
-                    cbunch.cmd_name,
-                    help = cbunch.description,
-                )
+            if not no_commands:
+                for name, cbunch in commands.items():
+                    commands_byname[cbunch.cmd_name] = cbunch
+                    spp.add_parser(
+                        cbunch.cmd_name,
+                        help = cbunch.description,
+                    )
             ap.print_help()
             sys.exit(0)
 
-        kwargs = dict()
+        kwargs = dict(base_kwargs)
         for argname, argbunch in arguments.items():
             val = getattr(args_parsed, argname)
             if val is not NOARG:
                 kwargs[argbunch.name_inject] = val
 
-        if commands_byname:
+        if commands_byname and not no_commands:
             command = getattr(args_parsed, '__command__', NOARG)
             command_idx_in_args = args.index(command)
             call_args = args[:command_idx_in_args]
@@ -187,6 +191,8 @@ class OOArgParse(
         kwargs['__cls_argparse_cmd__']  = command
         kwargs['__cls_argparse_cmd_args__']  = tuple(call_args) if call_args is not NOARG else None
         obj = cls(**kwargs)
+        if no_commands:
+            return obj
 
         if command is None:
             ret = obj.__arg_default__()
