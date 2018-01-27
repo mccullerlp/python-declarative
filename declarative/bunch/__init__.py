@@ -6,6 +6,10 @@ from .bunch import (
     HookBunch,
 )
 
+from .depbunch import (
+    DepBunch,
+)
+
 from .deep_bunch import (
     DeepBunch,
     DeepBunchSingleAssign,

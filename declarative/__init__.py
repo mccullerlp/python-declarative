@@ -39,6 +39,7 @@ from .callbacks import (
 
 from .bunch import (
     Bunch,
+    DepBunch,
     FrozenBunch,
     DeepBunch,
     TagBunch,

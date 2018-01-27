@@ -36,7 +36,7 @@ if sys.version_info < (3, 0, 0):
 
     #decode any unicode repr functions as py27 cannot handle them
     def repr_compat(func):
-        def __repr__(*args, **kwargs):
+        def __repr__(self, *args, **kwargs):
             return repr(func(self, *args, **kwargs).encode('utf-8').decode('utf-8'))
         #wrap it
         __repr__.__name__ = func.__name__
