@@ -1,3 +1,4 @@
+MANIFEST
 venv/
 *.egg-info/
 build/

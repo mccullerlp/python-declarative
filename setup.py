@@ -8,7 +8,7 @@ from setuptools import find_packages, setup
 from distutils.command.bdist import bdist
 from distutils.command.sdist import sdist
 
-version = '1.0.1.dev1'
+version = '1.0.1.dev2'
 
 def check_versions():
     print('versions checked')
@@ -18,14 +18,15 @@ def check_versions():
 
         if curpath != setuppath:
             sys.path.append(setuppath)
-        import msurrogate
+        import declarative
 
-        modfile = path.abspath(path.realpath(path.split(msurrogate.__file__)[0]))
+        modfile = path.abspath(path.realpath(path.split(declarative.__file__)[0]))
         mod_relpath = path.relpath(modfile, setuppath)
-        if mod_relpath == 'msurrogate':
-            if msurrogate.__version__ != version:
+        if mod_relpath == 'declarative':
+            if declarative.__version__ != version:
                 print("WARNING: Stated module version different than setup.py version", file = sys.stderr)
-                print("         '{0}' != '{1}'".format(msurrogate.__version__, version), file = sys.stderr)
+                print("         '{0}' != '{1}'".format(declarative.__version__, version), file = sys.stderr)
+                print("Fix version.py and setup.py for consistency")
 
         import subprocess
         try:
@@ -41,7 +42,7 @@ def check_versions():
                 else:
                     print("WARNING: latex git-tag different than setup.py version", file = sys.stderr)
                     print("         '{0}' != '{1}'".format(version, git_tag), file=sys.stderr)
-                print("         Perhaps update versions in setup.py and msurrogate.version, git commit, then git tag")
+                print("         Perhaps update versions in setup.py and declarative.version, git commit, then git tag")
                 print("         otherwise fix tag if not yet git pushed to remote (see DISTRIBUTION-README.md)")
 
     except ImportError:
@@ -93,13 +94,14 @@ setup(
         'Also included are nesting attribute-access dictionaries (Bunches) as well as value storage with callbacks. Relatively Magic-Free.'
     ),
     install_requires =[] + extra_install_requires,
-    extras_require={
+    extras_require   ={
         "hdf" : ["h5py"],
         "test" : ["pytest"],
     },
-    zip_safe=False,
-    keywords = 'declarative oop bunch callback attributes metaclass',
-    classifiers=[
+    cmdclass         = cmdclass,
+    zip_safe         = True,
+    keywords         = 'declarative, oop, bunch, callback, attributes, metaclass',
+    classifiers      = [
         'Development Status :: 3 - Alpha ',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',

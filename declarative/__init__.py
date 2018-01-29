@@ -61,6 +61,11 @@ from .utilities.unique import (
     unique_generator,
 )
 
+from .version import (
+    version,
+    __version__,
+)
+
 def first_non_none(*args):
     for a in args:
         if a is not None:
