@@ -32,6 +32,7 @@ def check_versions():
         try:
             git_tag = subprocess.check_output(['git', 'describe', '--tags'])
             git_tag = git_tag.strip()
+            git_tag = str(git_tag)
         except subprocess.CalledProcessError:
             pass
         else:

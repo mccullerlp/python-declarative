@@ -5,6 +5,8 @@ build/
 dist/
 site/
 
+.tox/
+
 TAGS
 .cache
 core.*

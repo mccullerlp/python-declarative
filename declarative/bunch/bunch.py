@@ -14,12 +14,6 @@ def try_remove(d, o):
     except ValueError:
         pass
 
-_dictmethods = dir(dict)
-try_remove(_dictmethods, '__new__')
-try_remove(_dictmethods, '__class__')
-try_remove(_dictmethods, '__dict__')
-try_remove(_dictmethods, '__getattribute__')
-try_remove(_dictmethods, '__init_subclass__')
 
 def gen_func(mname):
     def func(self, *args, **kwargs):
@@ -137,10 +131,30 @@ class Bunch(object):
     def __deepcopy__(self, memo):
         return self.__class__(copy.deepcopy(self._mydict, memo))
 
-    #TODO actually this shouldn't work at all
-    for mname in _dictmethods:
-        if mname not in locals():
-            locals()[mname] = gen_func(mname)
+    __contains__ = gen_func('__contains__')
+    __eq__       = gen_func('__eq__')
+    __format__   = gen_func('__format__')
+    __ge__       = gen_func('__ge__')
+    __gt__       = gen_func('__gt__')
+    __iter__     = gen_func('__iter__')
+    __le__       = gen_func('__le__')
+    __len__      = gen_func('__len__')
+    __lt__       = gen_func('__lt__')
+    __ne__       = gen_func('__ne__')
+    __setitem__  = gen_func('__setitem__')
+    __sizeof__   = gen_func('__sizeof__')
+    __str__      = gen_func('__str__')
+    clear        = gen_func('clear')
+    copy         = gen_func('copy')
+    fromkeys     = gen_func('fromkeys')
+    get          = gen_func('get')
+    items        = gen_func('items')
+    keys         = gen_func('keys')
+    pop          = gen_func('pop')
+    popitem      = gen_func('popitem')
+    setdefault   = gen_func('setdefault')
+    update       = gen_func('update')
+    values       = gen_func('values')
 
 
 class WriteCheckBunch(object):

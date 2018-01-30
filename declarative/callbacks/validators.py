@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 """
-import numpy as np
+import math
 
 from .relay import (
     RelayValueCoerced,
@@ -37,7 +37,7 @@ def min_max_validator(
     if not min_ne:
         if not max_ne:
             def validator(val):
-                if not np.isfinite(val):
+                if not math.isfinite(val):
                     if allow_nan:
                         return
                     else:
@@ -50,7 +50,7 @@ def min_max_validator(
                 return
         else:
             def validator(val):
-                if not np.isfinite(val):
+                if not math.isfinite(val):
                     if allow_nan:
                         return
                     else:
@@ -64,7 +64,7 @@ def min_max_validator(
     else:
         if not max_ne:
             def validator(val):
-                if not np.isfinite(val):
+                if not math.isfinite(val):
                     if allow_nan:
                         return
                     else:
@@ -77,7 +77,7 @@ def min_max_validator(
                 return
         else:
             def validator(val):
-                if not np.isfinite(val):
+                if not math.isfinite(val):
                     if allow_nan:
                         return
                     else:

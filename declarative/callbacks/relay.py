@@ -3,8 +3,6 @@
 """
 from ..utilities.representations import ReprMixin
 from ..properties import mproperty
-#TODO make this optional
-import numpy as np
 
 _UNIQUE = ("UNIQUE",)
 
@@ -80,7 +78,7 @@ class RelayValue(ReprMixin):
         return
 
     def put(self, val):
-        if np.any(val != self._value):
+        if any(val != self._value):
             self.validator(val)
             self._value = val
             for cb in list(self.callbacks.values()):
@@ -117,7 +115,7 @@ class RelayValue(ReprMixin):
 
     @value.setter
     def value(self, val):
-        if np.any(val != self._value):
+        if any(val != self._value):
             self.validator(val)
             self._value = val
             for cb in list(self.callbacks.values()):
