@@ -8,7 +8,7 @@ from setuptools import find_packages, setup
 from distutils.command.bdist import bdist
 from distutils.command.sdist import sdist
 
-version = '1.0.1.dev2'
+version = '1.0.1.rc1'
 
 def check_versions():
     print('versions checked')
@@ -101,7 +101,14 @@ setup(
     },
     cmdclass         = cmdclass,
     zip_safe         = True,
-    keywords         = 'declarative, oop, bunch, callback, attributes, metaclass',
+    keywords         = [
+        'declarative',
+        'oop',
+        'bunch',
+        'callback',
+        'attributes',
+        'metaclass',
+    ],
     classifiers      = [
         'Development Status :: 3 - Alpha ',
         'Intended Audience :: Developers',
