@@ -199,7 +199,7 @@ class DepBunch(object):
 
     def clear(self, name):
         #print('clear', name)
-        doneset = set([name])
+        doneset = set([])
         self._clear(name, doneset, mark = self._current_mark)
 
     def _clear(self, name, doneset, mark):
