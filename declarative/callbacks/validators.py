@@ -24,6 +24,7 @@ def min_max_validator_int(min_val, max_val):
         #catch NaN's hitting the int
         except ValueError:
             raise RelayValueRejected()
+        return val
     return validator
 
 
@@ -47,7 +48,7 @@ def min_max_validator(
                     raise RelayValueCoerced(min_val)
                 elif val > max_val:
                     raise RelayValueCoerced(max_val)
-                return
+                return val
         else:
             def validator(val):
                 if not math.isfinite(val):
@@ -60,7 +61,7 @@ def min_max_validator(
                     raise RelayValueCoerced(min_val)
                 elif val >= max_val:
                     raise RelayValueRejected()
-                return
+                return val
     else:
         if not max_ne:
             def validator(val):
@@ -74,7 +75,7 @@ def min_max_validator(
                     raise RelayValueRejected()
                 elif val > max_val:
                     raise RelayValueCoerced(max_val)
-                return
+                return val
         else:
             def validator(val):
                 if not math.isfinite(val):
@@ -87,7 +88,7 @@ def min_max_validator(
                     raise RelayValueRejected()
                 elif val >= max_val:
                     raise RelayValueRejected()
-                return
+                return val
     return validator
 
 

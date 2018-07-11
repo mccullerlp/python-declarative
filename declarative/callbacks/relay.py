@@ -3,6 +3,7 @@
 """
 from ..utilities.representations import ReprMixin
 from ..properties import mproperty
+import numpy as np
 
 _UNIQUE = ("UNIQUE",)
 
@@ -12,7 +13,8 @@ class RelayValueRejected(Exception):
 
 
 class RelayValueCoerced(RelayValueRejected):
-    pass
+    def __init__(self, preferred):
+        self.preferred = preferred
 
 
 class RelayValue(ReprMixin):
@@ -23,7 +25,7 @@ class RelayValue(ReprMixin):
 
     @staticmethod
     def validator(val):
-        return
+        return val
 
     def __init__(
         self,
@@ -34,10 +36,11 @@ class RelayValue(ReprMixin):
         """
         """
         super(RelayValue, self).__init__(**kwargs)
-        self._value = initial_value
         self.callbacks = {}
         if validator is not None:
             self.validator = validator
+        initial_value = self.validator(initial_value)
+        self._value = initial_value
         return
 
     def register(
@@ -78,8 +81,8 @@ class RelayValue(ReprMixin):
         return
 
     def put(self, val):
-        if any(val != self._value):
-            self.validator(val)
+        if np.any(val != self._value):
+            val = self.validator(val)
             self._value = val
             for cb in list(self.callbacks.values()):
                 cb(val)
@@ -87,12 +90,41 @@ class RelayValue(ReprMixin):
 
     def put_exclude_cb(self, val, key):
         if val != self._value:
-            self.validator(val)
+            val = self.validator(val)
             self._value = val
             for cb_key, cb in list(self.callbacks.items()):
                 if cb_key is not key:
                     cb(val)
         return
+
+    def put_coerce(self, val):
+        if np.any(val != self._value):
+            try:
+                val = self.validator(val)
+                retval = True
+            except RelayValueCoerced as E:
+                val = E.preferred
+                retval = False
+            self._value = val
+            for cb in list(self.callbacks.values()):
+                cb(val)
+            return retval
+        return True
+
+    def put_coerce_exclude_cb(self, val, key):
+        if val != self._value:
+            try:
+                val = self.validator(val)
+                retval = True
+            except RelayValueCoerced as E:
+                val = E.preferred
+                retval = False
+            self._value = val
+            for cb_key, cb in list(self.callbacks.items()):
+                if cb_key is not key:
+                    cb(val)
+            return retval
+        return True
 
     def put_valid(self, val):
         if val != self._value:
@@ -115,8 +147,8 @@ class RelayValue(ReprMixin):
 
     @value.setter
     def value(self, val):
-        if any(val != self._value):
-            self.validator(val)
+        if np.any(val != self._value):
+            val = self.validator(val)
             self._value = val
             for cb in list(self.callbacks.values()):
                 cb(val)
@@ -124,9 +156,7 @@ class RelayValue(ReprMixin):
 
     @mproperty
     def shadow(self):
-        def sub_validator(val):
-            return self.validator(val)
-        return self.__class__(self.value, validator = sub_validator)
+        return self.__class__(self.value, validator = self.validator)
 
     def shadow_from(self):
         self.put_valid(self.shadow._value)

@@ -29,6 +29,7 @@ if sys.version_info < (3, 0, 0):
         round,
         str,
         zip,
+        unicode,
     )
 
     from future.standard_library import install_aliases
@@ -43,30 +44,31 @@ if sys.version_info < (3, 0, 0):
         __repr__.__doc__ = func.__doc__
         return __repr__
 else:
-    super  = super
-    object = object
-    ascii  = ascii
-    bytes  = bytes
-    chr    = chr
-    dict   = dict
-    filter = filter
-    hex    = hex
-    input  = input
-    int    = int
-    map    = map
-    next   = next
-    oct    = oct
-    open   = open
-    pow    = pow
-    range  = range
-    round  = round
-    str    = str
-    zip    = zip
+    super   = super
+    object  = object
+    ascii   = ascii
+    bytes   = bytes
+    chr     = chr
+    dict    = dict
+    filter  = filter
+    hex     = hex
+    input   = input
+    int     = int
+    map     = map
+    next    = next
+    oct     = oct
+    open    = open
+    pow     = pow
+    range   = range
+    round   = round
+    str     = str
+    zip     = zip
+    unicode = str
 
     def repr_compat(func):
         return func
 
-PY3 = sys.version_info[0] == 3
+PY3 = (sys.version_info[0] == 3)
 
 if PY3:
     from .future3 import (

@@ -63,6 +63,8 @@ def argument(
             _default = default()
         else:
             _default = default
+        if _default is not NOARG:
+            _description = _description.replace('{default}', str(_default))
         def gen_argument(parser):
             kw = dict(kwargs)
             kw.update(
@@ -138,10 +140,11 @@ def group(
         return annotate_group(func)
 
 def command(
-        func = None,
-        name = None,
-        description = None,
-        order = None,
+        func            = None,
+        name            = None,
+        description     = None,
+        order           = None,
+        takes_arguments = False,
         **kwargs
 ):
     def annotate_command(func):
@@ -154,11 +157,12 @@ def command(
         else:
             _description = description
         func._argparse = Bunch(
-            type        = types.command,
-            cmd_name    = _name,
-            description = _description,
-            run_name    = func.__name__,
-            order       = order,
+            type            = types.command,
+            cmd_name        = _name,
+            description     = _description,
+            run_name        = func.__name__,
+            order           = order,
+            takes_arguments = takes_arguments,
         )
         return func
     if func is None:

@@ -12,8 +12,12 @@ NOARG = unique_generator()
 class ShadowBunch(object):
     """
     """
-    __slots__ = ('_dicts', '_idx', '__reduce__', '__reduce_ex__')
+    __slots__ = ('_dicts', '_idx', '__reduce__', '__reduce_ex__', '_abdict')
     _names = {}
+    #pulls all values into the active dictionary. This shows everything that has been accessed
+    _pull_full  = False
+
+    ABOUT_KEY = unique_generator()
 
     #needed to not explode some serializers since this object generally "hasattr" almost anything
     #__reduce_ex__ = None
@@ -24,10 +28,12 @@ class ShadowBunch(object):
     def __init__(
         self,
         dicts,
+        abdict = None,
         assign_idx = 0,
     ):
         self._dicts = tuple(dicts)
         self._idx   = assign_idx
+        self._abdict = abdict
         return
 
     def __getitem__(self, key):
@@ -44,13 +50,21 @@ class ShadowBunch(object):
                     #it DOES not just skip that item to return further dictionaries
                     break
                 else:
+                    if self._pull_full:
+                        if d is not self._dicts[self._idx]:
+                            self._dicts[self._idx][key] = item
                     return item
             if item:
                 anyfull = True
             dicts.append(item)
+        if self._abdict is not None:
+            abdict = self._abdict[key]
+        else:
+            abdict = None
         return self.__class__(
             dicts,
             assign_idx = self._idx,
+            abdict = abdict,
         )
 
     def useidx(self, idx):
@@ -59,6 +73,7 @@ class ShadowBunch(object):
         return self.__class__(
             self._dicts,
             assign_idx = idx,
+            abdict = self._abdict,
         )
 
     def extractidx(self, idx, default = NOARG):
@@ -102,9 +117,16 @@ class ShadowBunch(object):
             return default
         raise KeyError(key)
 
-    def setdefault(self, key, default):
+    def setdefault(self, key, default, about = None):
+        """
+        kwargs is special in the it sets one of the abdicts.
+        """
         dicts = []
         anyfull = False
+        if about is not None:
+            if self._abdict is None:
+                raise RuntimeError("abdict not specified on this ShadowBunch, so setdefault cannot have an about specifier")
+            self._abdict[key][self.ABOUT_KEY] = about
         for d in self._dicts:
             try:
                 item = d[key]
@@ -116,14 +138,22 @@ class ShadowBunch(object):
                     #it DOES not just skip that item to return further dictionaries
                     break
                 else:
+                    if self._pull_full:
+                        if d is not self._dicts[self._idx]:
+                            self._dicts[self._idx][key] = item
                     return item
             if item:
                 anyfull = True
             dicts.append(item)
         if anyfull:
+            if self._abdict is not None:
+                abdict = self._abdict[key]
+            else:
+                abdict = None
             return self.__class__(
                 dicts,
                 assign_idx = self._idx,
+                abdict = abdict,
             )
         else:
             self[key] = default

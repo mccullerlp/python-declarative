@@ -42,6 +42,10 @@ class RelayBoolBase(ReprMixin):
         """
         return bool(self)
 
+    @property
+    def value(self):
+        return bool(self)
+
     def __nonzero__(self):
         return self.__bool__()
 
@@ -131,6 +135,9 @@ class RelayBool(RelayBoolBase):
         return self.state
 
     def assign(self, value):
+        return self.put(value)
+
+    def put(self, value):
         """
         Set the value held by this instance
         """
@@ -147,6 +154,39 @@ class RelayBool(RelayBoolBase):
             finally:
                 self._assign_protect = None
         return
+
+    def put_valid(self, val):
+        return self.put(val)
+
+    def put_exclude_cb(self, value, key):
+        """
+        Set the value held by this instance
+        """
+        #python has no xor!
+        if (value and not self.state) or (not value and self.state):
+            self.state = not self.state
+            #print repr(self.callbacks_ontoggle)
+            if self._assign_protect is not None:
+                raise RuntimeError("Assign Assigned during assign!")
+            self._assign_protect = self.state
+            try:
+                for cb_key, callback in list(self.callbacks_ontoggle.items()):
+                    if key != cb_key:
+                        callback(self.state)
+            finally:
+                self._assign_protect = None
+        return
+
+    def put_valid_exclude_cb(self, val, key):
+        return self.put_exclude_cb(val, key)
+
+    @property
+    def value(self):
+        return bool(self)
+
+    @value.setter
+    def value(self, val):
+        return self.put(val)
 
     def assign_on(self):
         """

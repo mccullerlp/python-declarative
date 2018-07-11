@@ -148,24 +148,28 @@ class OOArgParse(
             print_help = args_parsed.help
 
         if print_help:
-            spp = ap.add_subparsers(dest = 'command', help = "(May have subarguments, use -h after them)")
+            spp = ap.add_subparsers(dest = 'command', help = "(May have subarguments, use -h after them for command specific help)")
 
             if default_cmd is not None:
                 if default_cmd.__doc__ is not None:
-                    doc = default_cmd.__doc__ + " [Default]"
+                    doc = default_cmd.__doc__ + " [Default, no arguments]"
                 else:
-                    doc = "Default Action"
+                    doc = "Default Action [command only]"
                 spp.add_parser(
-                    '[""]',
+                    '""',
                     help = doc,
                 )
 
             if not no_commands:
                 for name, cbunch in commands.items():
                     commands_byname[cbunch.cmd_name] = cbunch
+                    if cbunch.takes_arguments:
+                        extra = " [takes arguments]"
+                    else:
+                        extra = " [command only]"
                     spp.add_parser(
                         cbunch.cmd_name,
-                        help = cbunch.description,
+                        help = cbunch.description + extra,
                     )
             ap.print_help()
             sys.exit(0)
@@ -178,18 +182,21 @@ class OOArgParse(
 
         if commands_byname and not no_commands:
             command = getattr(args_parsed, '__command__', NOARG)
-            command_idx_in_args = args.index(command)
-            call_args = args[:command_idx_in_args]
+            if command is not None:
+                command_idx_in_args = args.index(command)
+                call_args = args[:command_idx_in_args]
+            else:
+                call_args = args[:]
         else:
             command = None
             call_args = args
-        args    = getattr(args_parsed, '__args__', NOARG)
+        args_sub    = getattr(args_parsed, '__args__', NOARG)
 
         #add in the extra kwargs that were given
         kwargs.update(exkwargs)
         kwargs['__cls_argparse_args__'] = tuple(call_args)
         kwargs['__cls_argparse_cmd__']  = command
-        kwargs['__cls_argparse_cmd_args__']  = tuple(call_args) if call_args is not NOARG else None
+        kwargs['__cls_argparse_cmd_args__']  = tuple(args_sub) if args_sub is not NOARG else None
         obj = cls(**kwargs)
         if no_commands:
             return obj
@@ -199,7 +206,10 @@ class OOArgParse(
         else:
             cbunch = commands_byname[command]
             call = getattr(obj, cbunch.run_name)
-            ret = call(args)
+            #TODO, check about taking additional arguments
+            if not cbunch.takes_arguments and args_sub:
+                raise RuntimeError("Final Command does not take additional arguments")
+            ret = call(args_sub)
         if __sys_exit:
             sys.exit(ret)
         return ret
