@@ -5,8 +5,6 @@ Pulls in the future library requirement if running on python2
 from __future__ import (absolute_import, division, print_function)
 import sys
 
-import sys
-
 if sys.version_info < (3, 0, 0):
     #requires the future library
     from builtins import (

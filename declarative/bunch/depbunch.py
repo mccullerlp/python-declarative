@@ -3,15 +3,13 @@
 """
 from __future__ import division, print_function, unicode_literals
 import collections
+import inspect
+import warnings
 
-
-class QuickBunch(dict):
-    def __getattr__(self, name):
-        return self[name]
-
-    def __setattr__(self, name, val):
-        self[name] = val
-        return
+try:
+    getargspec = inspect.getfullargspec
+except AttributeError:
+    getargspec = inspect.getargspec
 
 
 def simple_setter(self, val):
@@ -107,9 +105,11 @@ class DepBunch(object):
         dir1.sort()
         return dir1
 
-    def set_raw(self, name, val, setter = None):
+    def set_raw(self, name, val, setter = None, autodep = None):
         self.clear(name)
-        return self._assign(name, val, setter = setter)
+        if setter is not None and autodep is None:
+            autodep = True
+        return self._assign(name, val, setter = setter, autodep = autodep)
 
     def get_raw(self, name):
         if name in self._values:
@@ -138,6 +138,14 @@ class DepBunch(object):
 
     def __setitem__(self, name, val):
         setter = self._setters.get(name, None)
+
+        #check if it is in a descriptor property
+        if setter is None:
+            desc = getattr(self.__class__, name, None)
+            if isinstance(desc, DepBunchDescriptor):
+                desc.install(self, name)
+                setter = self._setters[name]
+
         if setter is None:
             self._values[name] = val
             self._values_computed[name] = False
@@ -157,16 +165,31 @@ class DepBunch(object):
     def __delattr__(self, name):
         self.clear(name)
 
-    def _compute(self, name):
+    def _compute(self, name, gen_func = None):
         if self._current_autodep and self._current_func is not None:
             self.dependencies_for(self._current_func, name)
 
-        prev_cf               = self._current_func
-        prev_adcf             = self._current_autodep
-        super(DepBunch, self).__setattr__('_current_autodep', self._autodeps_generators[name])
-        super(DepBunch, self).__setattr__('_current_func',  name)
         try:
-            gen_func                    = self._generators[name]
+            if gen_func is None:
+                gen_func = self._generators.get(name, None)
+
+            #install it from the descriptor
+            if gen_func is None:
+                desc = getattr(self.__class__, name, None)
+                if isinstance(desc, DepBunchDescriptor):
+                    desc.install(self, name)
+                    gen_func = self._generators.get(name, None)
+                elif desc is None:
+                    raise RuntimeError("Unrecognized attribute {}".format(name))
+                else:
+                    raise RuntimeError("attribute does not have a generator {}".format(name))
+
+            prev_cf               = self._current_func
+            prev_adcf             = self._current_autodep
+            super(DepBunch, self).__setattr__('_current_autodep', self._autodeps_generators[name])
+            super(DepBunch, self).__setattr__('_current_func',  name)
+
+            #calls with no arguments except self
             newval                      = gen_func(self)
             self._values[name]          = newval
             self._values_computed[name] = True
@@ -176,14 +199,28 @@ class DepBunch(object):
             super(DepBunch, self).__setattr__('_current_func',  prev_cf)
         return newval
 
-    def _assign(self, name, val, setter = None):
+    def _assign(self, name, val, setter = None, autodep = None):
         prev_cf               = self._current_func
         prev_adcf             = self._current_autodep
-        super(DepBunch, self).__setattr__('_current_autodep', self._autodeps_setters[name])
+        if autodep is None:
+            super(DepBunch, self).__setattr__('_current_autodep', self._autodeps_setters[name])
+        else:
+            super(DepBunch, self).__setattr__('_current_autodep', autodep)
         super(DepBunch, self).__setattr__('_current_func',  name)
         try:
             if setter is None:
                 setter = self._setters[name]
+
+            if setter is None:
+                desc = getattr(self.__class__, name, None)
+                if isinstance(desc, DepBunchDescriptor):
+                    desc.install(self, name)
+                    setter = self._setters[name]
+                elif desc is None:
+                    raise RuntimeError("Unrecognized attribute {}".format(name))
+                else:
+                    raise RuntimeError("attribute does not have a setter {}".format(name))
+
             newval   = setter(self, val)
 
             if newval is self.TAG_NO_SET:
@@ -317,6 +354,43 @@ class DepBunch(object):
                 )
             return deco_grab
 
+    def add_gensetter(
+        self,
+        name     = None,
+        func     = None,
+        autodeps = True,
+        clear    = True,
+    ):
+        self.add_generator(
+            name     = name,
+            func     = func,
+            autodeps = autodeps,
+            clear    = clear,
+        )
+        self.add_setter(
+            name     = name,
+            func     = func,
+            autodeps = autodeps,
+            clear    = clear,
+        )
+
+    def deco_gensetter(
+        self,
+        name = None,
+        **kwargs
+    ):
+        if callable(name):
+            #name is a func but the call handles that
+            return self.add_gensetter(name = name, **kwargs)
+        else:
+            def deco_grab(func):
+                return self.add_gensetter(
+                    name     = name,
+                    func     = func,
+                    **kwargs
+                )
+            return deco_grab
+
     def add_copier(
             self,
             name     = None,
@@ -368,3 +442,65 @@ class DepBunch(object):
     def __setstate__(self, state):
         self.__dict__.update(state)
 
+
+class DepBunchDescriptor(object):
+    """
+    wraps a member function just as :obj:`property` but saves its value after evaluation
+    (and is thus only evaluated once)
+    """
+
+    def __init__(
+        self,
+        fgetset,
+        name = None,
+        doc = None,
+        autodeps = True,
+        original_callname = None,
+    ):
+        self.fget = fgetset
+
+        aspec = getargspec(fgetset)
+        #must have self and one other for it to be a setter
+        if len(aspec.args) > 1:
+            self.fset = fgetset
+        else:
+            self.fset = simple_setter
+
+        self.autodeps = autodeps
+
+        if name is None:
+            self.__name__ = fgetset.__name__
+        else:
+            self.__name__ = name
+        if doc is None:
+            self.__doc__ = fgetset.__doc__
+        else:
+            self.__doc__ = doc
+        if original_callname is not None:
+            self.original_callname = original_callname
+        else:
+            self.original_callname = self.__class__.__name__
+        return
+
+    def __get__(self, obj, cls):
+        if obj is None:
+            return self
+        return obj[self.__name__]
+
+    def __set__(self, obj, value):
+        obj[self.__name__] = value
+
+    def __delete__(self, obj):
+        del obj[self.__name__]
+        return
+
+    def install(self, obj, name):
+        if name != self.__name__:
+            warnings.warn(
+                'Depbunch, depB_property name not the same as install name'
+            )
+        obj.add_generator(name, self.fget, self.autodeps)
+        obj.add_setter(name, self.fset, self.autodeps)
+        return
+
+depB_property = DepBunchDescriptor

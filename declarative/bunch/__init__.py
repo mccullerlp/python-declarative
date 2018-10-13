@@ -8,6 +8,7 @@ from .bunch import (
 
 from .depbunch import (
     DepBunch,
+    depB_property,
 )
 
 from .deep_bunch import (
