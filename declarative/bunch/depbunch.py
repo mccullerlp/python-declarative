@@ -166,29 +166,29 @@ class DepBunch(object):
         self.clear(name)
 
     def _compute(self, name, gen_func = None):
+        if gen_func is None:
+            gen_func = self._generators.get(name, None)
+
+        #install it from the descriptor
+        if gen_func is None:
+            desc = getattr(self.__class__, name, None)
+            if isinstance(desc, DepBunchDescriptor):
+                desc.install(self, name)
+                gen_func = self._generators.get(name, None)
+            elif desc is None:
+                raise RuntimeError("Unrecognized attribute {}".format(name))
+            else:
+                raise RuntimeError("attribute does not have a generator {}".format(name))
+
         if self._current_autodep and self._current_func is not None:
             self.dependencies_for(self._current_func, name)
 
+        prev_cf               = self._current_func
+        prev_adcf             = self._current_autodep
+        super(DepBunch, self).__setattr__('_current_autodep', self._autodeps_generators[name])
+        super(DepBunch, self).__setattr__('_current_func',  name)
+
         try:
-            if gen_func is None:
-                gen_func = self._generators.get(name, None)
-
-            #install it from the descriptor
-            if gen_func is None:
-                desc = getattr(self.__class__, name, None)
-                if isinstance(desc, DepBunchDescriptor):
-                    desc.install(self, name)
-                    gen_func = self._generators.get(name, None)
-                elif desc is None:
-                    raise RuntimeError("Unrecognized attribute {}".format(name))
-                else:
-                    raise RuntimeError("attribute does not have a generator {}".format(name))
-
-            prev_cf               = self._current_func
-            prev_adcf             = self._current_autodep
-            super(DepBunch, self).__setattr__('_current_autodep', self._autodeps_generators[name])
-            super(DepBunch, self).__setattr__('_current_func',  name)
-
             #calls with no arguments except self
             newval                      = gen_func(self)
             self._values[name]          = newval
@@ -200,6 +200,19 @@ class DepBunch(object):
         return newval
 
     def _assign(self, name, val, setter = None, autodep = None):
+        if setter is None:
+            setter = self._setters[name]
+
+        if setter is None:
+            desc = getattr(self.__class__, name, None)
+            if isinstance(desc, DepBunchDescriptor):
+                desc.install(self, name)
+                setter = self._setters[name]
+            elif desc is None:
+                raise RuntimeError("Unrecognized attribute {}".format(name))
+            else:
+                raise RuntimeError("attribute does not have a setter {}".format(name))
+
         prev_cf               = self._current_func
         prev_adcf             = self._current_autodep
         if autodep is None:
@@ -207,20 +220,8 @@ class DepBunch(object):
         else:
             super(DepBunch, self).__setattr__('_current_autodep', autodep)
         super(DepBunch, self).__setattr__('_current_func',  name)
+
         try:
-            if setter is None:
-                setter = self._setters[name]
-
-            if setter is None:
-                desc = getattr(self.__class__, name, None)
-                if isinstance(desc, DepBunchDescriptor):
-                    desc.install(self, name)
-                    setter = self._setters[name]
-                elif desc is None:
-                    raise RuntimeError("Unrecognized attribute {}".format(name))
-                else:
-                    raise RuntimeError("attribute does not have a setter {}".format(name))
-
             newval   = setter(self, val)
 
             if newval is self.TAG_NO_SET:
@@ -240,13 +241,11 @@ class DepBunch(object):
         self._clear(name, doneset, mark = self._current_mark)
 
     def _clear(self, name, doneset, mark):
-        #print('_clear', name)
         if name in doneset:
             return False
         doneset.add(name)
         if name in self._values:
             if not (self._values_mark[name] > mark):
-                #print('del ', name)
                 del self._values[name]
                 del self._values_computed[name]
             else:
@@ -499,8 +498,8 @@ class DepBunchDescriptor(object):
             warnings.warn(
                 'Depbunch, depB_property name not the same as install name'
             )
-        obj.add_generator(name, self.fget, self.autodeps)
-        obj.add_setter(name, self.fset, self.autodeps)
+        obj.add_generator(name, self.fget, self.autodeps, clear = False)
+        obj.add_setter(name, self.fset, self.autodeps, clear = False)
         return
 
 depB_property = DepBunchDescriptor
