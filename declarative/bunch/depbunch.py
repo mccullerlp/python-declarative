@@ -6,6 +6,10 @@ import collections
 import inspect
 import warnings
 
+#unique element to indicate a default argument
+_NOARG = lambda : _NOARG
+NOARG = ("NOARG", _NOARG)
+
 try:
     getargspec = inspect.getfullargspec
 except AttributeError:
@@ -113,10 +117,11 @@ class DepBunch(object):
             autodep = True
         return self._assign(name, val, setter = setter, autodep = autodep)
 
-    def get_raw(self, name):
-        if name in self._values:
-            return self._values[name]
-        return self.compute(name)
+    def get_raw(self, name, default = NOARG):
+        val = self._values.get(name, default)
+        if val is NOARG:
+            return self.compute(name)
+        return val
 
     def get_default(self, name, default):
         if name in self._values:
@@ -193,7 +198,7 @@ class DepBunch(object):
         try:
             #calls with no arguments except self
             ideps = self._value_dependencies_inv.get(name, None)
-            print(name, ideps)
+            #print(name, ideps)
             if ideps is not None:
                 #TODO, better error
                 raise RuntimeError("Must be infinitely recursive!")
@@ -207,11 +212,11 @@ class DepBunch(object):
             self._values_mark[name]     = self._current_mark
             for dep in ideps:
                 self._value_dependencies[dep].add(name)
-            print(name, 'del')
+            #print(name, 'del')
             del self._value_dependencies_inv[name]
-        except Exception as e:
-            print("AAAH", e)
-            raise
+        #except Exception as e:
+            #print("AAAH", e)
+            #raise
         finally:
             super(DepBunch, self).__setattr__('_current_autodep', prev_adcf)
             super(DepBunch, self).__setattr__('_current_func',  prev_cf)
@@ -241,7 +246,7 @@ class DepBunch(object):
 
         try:
             ideps = self._value_dependencies_inv.get(name, None)
-            print(name, ideps)
+            #print(name, ideps)
             if ideps is not None:
                 #TODO, better error
                 raise RuntimeError("Must be infinitely recursive!")
@@ -258,11 +263,11 @@ class DepBunch(object):
                 self._values_mark[name] = self._current_mark
                 for dep in ideps:
                     self._value_dependencies[dep].add(name)
-            print(name, 'del')
+            #print(name, 'del')
             del self._value_dependencies_inv[name]
-        except Exception as e:
-            print("AAAH", e)
-            raise
+        #except Exception as e:
+            #print("AAAH", e)
+            #raise
         finally:
             super(DepBunch, self).__setattr__('_current_autodep', prev_adcf)
             super(DepBunch, self).__setattr__('_current_func',  prev_cf)
