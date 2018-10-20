@@ -32,6 +32,8 @@ class DepBunch(object):
     ):
         super(DepBunch, self).__setattr__('_current_func', None)
         super(DepBunch, self).__setattr__('_current_autodep', False)
+        #to hold currently executing values
+        super(DepBunch, self).__setattr__('_value_dependencies_inv',  {})
 
         if copy is None:
             super(DepBunch, self).__setattr__('_current_mark', 0)
@@ -190,10 +192,26 @@ class DepBunch(object):
 
         try:
             #calls with no arguments except self
+            ideps = self._value_dependencies_inv.get(name, None)
+            print(name, ideps)
+            if ideps is not None:
+                #TODO, better error
+                raise RuntimeError("Must be infinitely recursive!")
+            ideps = set()
+            self._value_dependencies_inv[name] = ideps
+
             newval                      = gen_func(self)
+
             self._values[name]          = newval
             self._values_computed[name] = True
             self._values_mark[name]     = self._current_mark
+            for dep in ideps:
+                self._value_dependencies[dep].add(name)
+            print(name, 'del')
+            del self._value_dependencies_inv[name]
+        except Exception as e:
+            print("AAAH", e)
+            raise
         finally:
             super(DepBunch, self).__setattr__('_current_autodep', prev_adcf)
             super(DepBunch, self).__setattr__('_current_func',  prev_cf)
@@ -222,14 +240,29 @@ class DepBunch(object):
         super(DepBunch, self).__setattr__('_current_func',  name)
 
         try:
+            ideps = self._value_dependencies_inv.get(name, None)
+            print(name, ideps)
+            if ideps is not None:
+                #TODO, better error
+                raise RuntimeError("Must be infinitely recursive!")
+            ideps = set()
+            self._value_dependencies_inv[name] = ideps
+
             newval   = setter(self, val)
 
             if newval is self.TAG_NO_SET:
-                return
-
-            self._values[name]          = newval
-            self._values_computed[name] = False
-            self._values_mark[name] = self._current_mark
+                pass
+            else:
+                self._values[name]          = newval
+                self._values_computed[name] = False
+                self._values_mark[name] = self._current_mark
+                for dep in ideps:
+                    self._value_dependencies[dep].add(name)
+            print(name, 'del')
+            del self._value_dependencies_inv[name]
+        except Exception as e:
+            print("AAAH", e)
+            raise
         finally:
             super(DepBunch, self).__setattr__('_current_autodep', prev_adcf)
             super(DepBunch, self).__setattr__('_current_func',  prev_cf)
@@ -241,24 +274,31 @@ class DepBunch(object):
         self._clear(name, doneset, mark = self._current_mark)
 
     def _clear(self, name, doneset, mark):
+        #print("CLEAR: ", name)
         if name in doneset:
             return False
         doneset.add(name)
         if name in self._values:
+            #TODO should be >=?
             if not (self._values_mark[name] > mark):
                 del self._values[name]
                 del self._values_computed[name]
+                retval = True
+                #print("DEL: ", name)
             else:
                 #this assumes that the deps were already triggered on the set that put this mark on
                 return False
+        else:
+            retval = True
 
         if name not in self._value_dependencies:
-            return True
+            return retval
         deps = self._value_dependencies[name]
         for dep in list(deps):
             if self._clear(dep, doneset, mark = mark):
+                #print("REMOVE: ", name, dep)
                 deps.remove(dep)
-        return True
+        return retval
 
     def _clear_dependent(self, name, mark = None):
         #print('_clear_d', name)
@@ -269,6 +309,7 @@ class DepBunch(object):
         deps = self._value_dependencies[name]
         for dep in list(deps):
             if self._clear(dep, doneset, mark = mark):
+                #print('REMOVE_D:', name, dep)
                 deps.remove(dep)
         return True
 
@@ -431,8 +472,12 @@ class DepBunch(object):
         self.dependencies_for(self._current_func, *args)
 
     def dependencies_for(self, name, *args):
+        ideps = self._value_dependencies_inv.get(name, None)
+        if ideps is not None:
+            ideps.update(args)
         for dep in args:
             #uses the assumption that _value_dependencies is a defaultdict
+            #print("DEP: ", name, dep)
             self._value_dependencies[dep].add(name)
 
     def __getstate__(self):
@@ -498,8 +543,21 @@ class DepBunchDescriptor(object):
             warnings.warn(
                 'Depbunch, depB_property name not the same as install name'
             )
-        obj.add_generator(name, self.fget, self.autodeps, clear = False)
-        obj.add_setter(name, self.fset, self.autodeps, clear = False)
+        #print('install', name, self.autodeps)
+        obj.add_generator(name, self.fget, autodeps = self.autodeps, clear = False)
+        obj.add_setter(name, self.fset, autodeps = self.autodeps, clear = False)
         return
 
 depB_property = DepBunchDescriptor
+
+def depB_property(
+    fgetset = None,
+    **kwargs
+):
+    if fgetset is not None:
+        #name is a func but the call handles that
+        return DepBunchDescriptor(fgetset, **kwargs)
+    else:
+        def deco_grab(func):
+            return DepBunchDescriptor(func, **kwargs)
+        return deco_grab
