@@ -213,11 +213,8 @@ class DepBunch(object):
             for dep in ideps:
                 self._value_dependencies[dep].add(name)
             #print(name, 'del')
-            del self._value_dependencies_inv[name]
-        #except Exception as e:
-            #print("AAAH", e)
-            #raise
         finally:
+            del self._value_dependencies_inv[name]
             super(DepBunch, self).__setattr__('_current_autodep', prev_adcf)
             super(DepBunch, self).__setattr__('_current_func',  prev_cf)
         return newval
@@ -263,12 +260,8 @@ class DepBunch(object):
                 self._values_mark[name] = self._current_mark
                 for dep in ideps:
                     self._value_dependencies[dep].add(name)
-            #print(name, 'del')
-            del self._value_dependencies_inv[name]
-        #except Exception as e:
-            #print("AAAH", e)
-            #raise
         finally:
+            del self._value_dependencies_inv[name]
             super(DepBunch, self).__setattr__('_current_autodep', prev_adcf)
             super(DepBunch, self).__setattr__('_current_func',  prev_cf)
         return newval
