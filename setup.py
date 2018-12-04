@@ -74,8 +74,8 @@ try:
             check_versions()
 except ImportError:
     pass
-
-cmdclass['bdist_wheel'] = check_bdist_wheel
+else:
+    cmdclass['bdist_wheel'] = check_bdist_wheel
 
 
 extra_install_requires = []
