@@ -8,7 +8,7 @@ from setuptools import find_packages, setup
 from distutils.command.bdist import bdist
 from distutils.command.sdist import sdist
 
-version = '1.1.0'
+version = '1.1.1'
 
 def check_versions():
     print('versions checked')
