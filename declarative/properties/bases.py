@@ -68,7 +68,10 @@ class HasDeclaritiveAttributes(SuperBase):
             attr_list = [cls]
             attrs = dir(cls)
             for attr in attrs:
-                if getattr(getattr(self.__class__, attr), '_declarative_instantiation', False):
+                acls = getattr(self.__class__, attr)
+                #the attribute must be a descriptor whose class must have _declarative_instantiation
+                #defined, for it to be accessed during init
+                if getattr(acls.__class__, '_declarative_instantiation', False):
                     getattr(self, attr)
                     attr_list.append(attr)
             #set to indicate the memoized list of attributes
