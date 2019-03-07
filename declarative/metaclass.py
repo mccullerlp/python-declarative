@@ -5,7 +5,7 @@
 from __future__ import division, print_function
 #from builtins import object
 import warnings
-from .utilities.future_from_2 import with_metaclass
+from .utilities.future_from_2 import with_metaclass, str, unicode
 
 
 class AutodecorateMeta(type):
@@ -93,13 +93,15 @@ class AttrExpandingObject(Autodecorate):
 
     def __dir__(self):
         predir = super(AttrExpandingObject, self).__dir__()
-        predir.extend(iter(self._cls_getsetattr_expansion.keys()))
+        predir.extend(k for k in self._cls_getsetattr_expansion.keys() if isinstance(k, (str, unicode)))
+        #predir.sort()
         return predir
 
 
 #separated because __setattr__ is so much more advanced and awful than __getattr__ overloading
 class GetSetAttrExpandingObject(AttrExpandingObject):
     def __setattr__(self, name, val):
+        assert(isinstance(name, (str, unicode)))
         expand = self._cls_getsetattr_expansion.get(name, None)
         if expand is None:
             return super(GetSetAttrExpandingObject, self).__setattr__(name, val)

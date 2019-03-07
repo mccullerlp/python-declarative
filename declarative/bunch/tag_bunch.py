@@ -2,7 +2,7 @@
 """
 """
 from collections import Mapping
-from ..utilities.future_from_2 import str, object, repr_compat
+from ..utilities.future_from_2 import str, object, repr_compat, unicode
 from ..utilities.unique import NOARG
 
 from .deep_bunch import DeepBunch
@@ -115,7 +115,7 @@ class TagBunch(object):
         return key in self
 
     def __dir__(self):
-        items = list(self._dict.keys())
+        items = list(k for k in self._dict.keys() if isinstance(k, (str, unicode)))
         items.sort()
         #items += dir(super(Bunch, self))
         return items

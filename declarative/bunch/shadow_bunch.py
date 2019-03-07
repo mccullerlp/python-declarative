@@ -3,7 +3,7 @@
 """
 from collections import Mapping
 from numbers import Number
-from ..utilities.future_from_2 import repr_compat
+from ..utilities.future_from_2 import repr_compat, str, unicode
 
 from ..utilities.unique import unique_generator
 NOARG = unique_generator()
@@ -171,7 +171,7 @@ class ShadowBunch(object):
     def __dir__(self):
         items = list(super(ShadowBunch, self).__dir__())
         for d in self._dicts:
-            items.extend(d.keys())
+            items.extend(k for k in d.keys() if isinstance(k, (str, unicode)))
         items.sort()
         return items
 

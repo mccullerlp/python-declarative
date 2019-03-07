@@ -8,6 +8,8 @@ import h5py
 import numpy as np
 from collections import Mapping
 
+
+from ..utilities.future_from_2 import str, unicode
 from ..utilities.unique import NOARG
 from ..utilities.interrupt_delay import DelayedKeyboardInterrupt
 
@@ -324,8 +326,9 @@ class HDFDeepBunch(object):
         return cls(item)
 
     def __dir__(self):
-        items = sorted(self._hdf.keys())
+        items = list(k for k in self._hdf.keys() if isinstance(k, (str, unicode)))
         items += ['overwrite', 'safewrite', 'hdf']
+        #items.sort()
         #items += dir(super(Bunch, self))
         return items
 

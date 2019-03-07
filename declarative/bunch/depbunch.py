@@ -6,6 +6,8 @@ import collections
 import inspect
 import warnings
 
+from ..utilities.future_from_2 import str, unicode
+
 #unique element to indicate a default argument
 _NOARG = lambda : _NOARG
 NOARG = ("NOARG", _NOARG)
@@ -105,10 +107,10 @@ class DepBunch(object):
 
     def __dir__(self):
         dir1 = list(super(DepBunch, self).__dir__())
-        dir1.extend(self._generators.keys())
-        dir1.extend(self._setters.keys())
-        dir1.extend(self._values.keys())
-        dir1.sort()
+        dir1.extend(k for k in self._generators.keys() if isinstance(k, (str, unicode)))
+        dir1.extend(k for k in self._generators.keys() if isinstance(k, (str, unicode)))
+        dir1.extend(k for k in self._generators.keys() if isinstance(k, (str, unicode)))
+        #dir1.sort()
         return dir1
 
     def set_raw(self, name, val, setter = None, autodep = None):

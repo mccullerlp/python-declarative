@@ -35,7 +35,7 @@ class MemoizedGroupDescriptorBase(object):
                 return self
             result = obj.__dict__.get(self.__name__, _UNIQUE_local)
             if result is _UNIQUE_local:
-                storage = obj.__dict__.get(self.root, None)
+                storage = obj.__dict__.get(self.root.__name__, None)
                 if storage is None:
                     try:
                         self.root._build(obj, cls)
@@ -44,7 +44,7 @@ class MemoizedGroupDescriptorBase(object):
                     except Exception as E:
                         print(("Exception in: ", self.__name__, " of: ", obj))
                         raise
-                    storage = obj.__dict__[self.root]
+                    storage = obj.__dict__[self.root.__name__]
 
                 bd = getattr(obj, '__boot_dict__', None)
                 if bd is not None:
@@ -273,7 +273,7 @@ class MemoizedGroupDescriptorRoot(MemoizedGroupDescriptorBase):
                     name = self.__name__,
                 )
 
-            obj.__dict__[self] = result
+            obj.__dict__[self.__name__] = result
             return
 
 

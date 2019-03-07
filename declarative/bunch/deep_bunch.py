@@ -2,7 +2,7 @@
 """
 """
 from __future__ import division, print_function, unicode_literals
-from ..utilities.future_from_2 import repr_compat, object, str
+from ..utilities.future_from_2 import repr_compat, object, str, unicode
 from collections import Mapping
 
 #use local noarg to not conflict with others
@@ -212,8 +212,9 @@ class DeepBunch(object):
         return cls(item)
 
     def __dir__(self):
-        items = sorted(self._dict.keys())
+        items = [k for k in self._dict.keys() if isinstance(k, (str, unicode))]
         items += ['mydict']
+        #items.sort()
         #items += dir(super(Bunch, self))
         return items
 

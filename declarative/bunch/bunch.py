@@ -2,7 +2,7 @@
 """
 """
 from __future__ import (division, print_function, unicode_literals)
-from ..utilities.future_from_2 import str, object, dict, repr_compat
+from ..utilities.future_from_2 import str, object, dict, repr_compat, unicode
 
 from collections import Mapping, MutableSequence
 import numpy as np
@@ -90,7 +90,7 @@ class Bunch(object):
         return
 
     def __dir__(self):
-        items = sorted(self._mydict.keys())
+        items = [k for k in self._mydict.keys() if isinstance(k, (str, unicode))]
         #items += dir(super(Bunch, self))
         return items
 
