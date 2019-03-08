@@ -29,7 +29,12 @@ class AutodecorateMeta(type):
         return
 
 
-class Autodecorate(with_metaclass(AutodecorateMeta, object)):
+class Autodecorate(with_metaclass(AutodecorateMeta)):
+
+    ##this __init__ stub is needed or the init of 'object' is used!
+    #def __init__(self, *args, **kwargs):
+    #    super(Autodecorate, self).__init__(*args, **kwargs)
+
     @classmethod
     def __mc_autodecorators__(cls, decorators):
         return decorators
@@ -94,7 +99,7 @@ class AttrExpandingObject(Autodecorate):
     def __dir__(self):
         predir = super(AttrExpandingObject, self).__dir__()
         predir.extend(k for k in self._cls_getsetattr_expansion.keys() if isinstance(k, (str, unicode)))
-        #predir.sort()
+        predir.sort()
         return predir
 
 

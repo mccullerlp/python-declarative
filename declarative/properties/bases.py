@@ -61,19 +61,30 @@ class HasDeclaritiveAttributes(SuperBase):
         attr_list = iter(self.__cls_decl_attrs__)
         #check that the first item is this class, if not then it must have pulled a parent's list
         if next(attr_list) == self.__class__:
+            #print('attrs2', list(self.__cls_decl_attrs__))
             for attr in attr_list:
                 getattr(self, attr)
         else:
             cls = self.__class__
             attr_list = [cls]
             attrs = dir(cls)
+            #print('attrs', list(attrs))
             for attr in attrs:
                 acls = getattr(self.__class__, attr)
                 #the attribute must be a descriptor whose class must have _declarative_instantiation
                 #defined, for it to be accessed during init
-                if getattr(acls.__class__, '_declarative_instantiation', False):
+                decl = getattr(acls.__class__, '_declarative_instantiation', None)
+                if decl:
+                    getattr(self, attr)
+                    attr_list.append(attr)
+                elif decl is not None and getattr(acls, '_declarative_instantiation', False):
+                    #this checks if the INSTANCE of the descriptor has had _declarative_instantiation
+                    #but only checks if the class has that item, so that the
+                    #getattr can't fail on weird objects
                     getattr(self, attr)
                     attr_list.append(attr)
             #set to indicate the memoized list of attributes
             cls.__cls_decl_attrs__      = tuple(attr_list)
+            #print('attr_list', list(self.__cls_decl_attrs__))
+        #print("DECL: ", self)
         return

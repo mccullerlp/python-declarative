@@ -35,7 +35,11 @@ class MemoizedGroupDescriptorBase(object):
                 return self
             result = obj.__dict__.get(self.__name__, _UNIQUE_local)
             if result is _UNIQUE_local:
-                storage = obj.__dict__.get(self.root.__name__, None)
+                bd = getattr(obj, '__boot_dict__', None)
+                if bd is None:
+                    bd = {}
+                    obj.__boot_dict__ = bd
+                storage = bd.get(self.root, None)
                 if storage is None:
                     try:
                         self.root._build(obj, cls)
@@ -44,7 +48,7 @@ class MemoizedGroupDescriptorBase(object):
                     except Exception as E:
                         print(("Exception in: ", self.__name__, " of: ", obj))
                         raise
-                    storage = obj.__dict__[self.root.__name__]
+                    storage = obj.__boot_dict__[self.root]
 
                 bd = getattr(obj, '__boot_dict__', None)
                 if bd is not None:
@@ -95,18 +99,17 @@ class MemoizedGroupDescriptorBase(object):
             raise
 
     def __set__(self, obj, value):
-        storage = obj.__dict__.get(self.root, _UNIQUE_local)
+        bd = getattr(obj, '__boot_dict__', None)
+        if bd is None:
+            bd = {}
+            obj.__boot_dict__ = bd
+
+        storage = bd.get(self.root, _UNIQUE_local)
         if storage is _UNIQUE_local:
-            bd = getattr(obj, '__boot_dict__', None)
-            if bd is not None:
-                bdp = bd.get(self.root.__name__, _UNIQUE_local)
-                if bdp is _UNIQUE_local:
-                    bdp = dict()
-                    bd[self.root.__name__] = bdp
-            else:
+            bdp = bd.get(self.root.__name__, _UNIQUE_local)
+            if bdp is _UNIQUE_local:
                 bdp = dict()
-                bd  = {self.root.__name__ : bdp}
-                obj.__boot_dict__ = bd
+                bd[self.root.__name__] = bdp
             oldv = bdp.setdefault(self.__name__, value)
             if oldv is not value:
                 raise RuntimeError("Initial set on object must be unique")
@@ -234,14 +237,16 @@ class MemoizedGroupDescriptorRoot(MemoizedGroupDescriptorBase):
         )
 
     def _build(self, obj, cls):
-        result = obj.__dict__.get(self, _UNIQUE_local)
+        bd = getattr(obj, '__boot_dict__', None)
+        if bd is None:
+            bd = {}
+            obj.__boot_dict__ = bd
+        result = bd.get(self, _UNIQUE_local)
         if result is _UNIQUE_local:
             #bd = obj.__boot_dict__
             bd = getattr(obj, '__boot_dict__', None)
             if bd is not None:
                 sources = bd.pop(self.__name__, _UNIQUE_local)
-                if not bd:
-                    del obj.__boot_dict__
             else:
                 sources = _UNIQUE_local
 
@@ -257,10 +262,10 @@ class MemoizedGroupDescriptorRoot(MemoizedGroupDescriptorBase):
             )
 
             #inject the values into the boot_dict
+            if bd is None:
+                bd = dict()
+                obj.__boot_dict__ = bd
             for k, v in sources.items():
-                if bd is None:
-                    bd = dict()
-                    obj.__boot_dict__ = bd
                 bd[k] = v
 
             if __debug__:
@@ -273,7 +278,11 @@ class MemoizedGroupDescriptorRoot(MemoizedGroupDescriptorBase):
                     name = self.__name__,
                 )
 
-            obj.__dict__[self.__name__] = result
+            bd = getattr(obj, '__boot_dict__', None)
+            if bd is None:
+                bd = {}
+                obj.__boot_dict__ = bd
+            bd[self] = result
             return
 
 

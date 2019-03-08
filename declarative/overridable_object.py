@@ -64,6 +64,7 @@ class OverridableObject(HasDeclaritiveAttributes, SuperBase, object):
         #now run the __mid_init__ before all of the declarative arguments trigger
         self.__mid_init__()
         super(OverridableObject, self).__init__()
+        #print("OO: ", self)
         return
 
     def __mid_init__(self):
