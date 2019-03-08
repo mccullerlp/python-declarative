@@ -97,7 +97,7 @@ class AttrExpandingObject(Autodecorate):
             return super(AttrExpandingObject, self).__getattr__(name)
 
     def __dir__(self):
-        predir = super(AttrExpandingObject, self).__dir__()
+        predir = dir(super(AttrExpandingObject, self))
         predir.extend(k for k in self._cls_getsetattr_expansion.keys() if isinstance(k, (str, unicode)))
         predir.sort()
         return predir
