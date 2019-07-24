@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 """
-from collections import Mapping
+try:
+    from collections.abc import Mapping as MappingABC
+except ImportError:
+    from collections import Mapping as MappingABC
 from numbers import Number
 from ..utilities.future_from_2 import repr_compat, str, unicode
 
@@ -44,7 +47,7 @@ class ShadowBunch(object):
                 item = d[key]
             except KeyError:
                 continue
-            if not isinstance(item, Mapping):
+            if not isinstance(item, MappingABC):
                 if dicts and anyfull:
                     #break returns the dictionaries already stored if suddenly one doesn't store a dict
                     #it DOES not just skip that item to return further dictionaries
@@ -132,7 +135,7 @@ class ShadowBunch(object):
                 item = d[key]
             except KeyError:
                 continue
-            if not isinstance(item, Mapping):
+            if not isinstance(item, MappingABC):
                 if dicts and anyfull:
                     #break returns the dictionaries already stored if suddenly one doesn't store a dict
                     #it DOES not just skip that item to return further dictionaries
@@ -238,4 +241,4 @@ class ShadowBunch(object):
         return
 
 
-Mapping.register(ShadowBunch)
+MappingABC.register(ShadowBunch)

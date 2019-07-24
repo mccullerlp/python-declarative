@@ -2,7 +2,10 @@
 """
 """
 from __future__ import division, print_function, unicode_literals
-from collections import Mapping
+try:
+    from collections.abc import Mapping as MappingABC
+except ImportError:
+    from collections import Mapping as MappingABC
 from ..utilities.future_from_2 import str, unicode
 
 
@@ -29,5 +32,5 @@ class QuickBunch(dict):
     def get(self, name, *default):
         return super(QuickBunch, self).get(name, *default)
 
-Mapping.register(QuickBunch)
+MappingABC.register(QuickBunch)
 

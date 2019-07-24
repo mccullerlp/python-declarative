@@ -6,7 +6,10 @@ from __future__ import print_function
 from ..utilities.future_from_2 import repr_compat
 import h5py
 import numpy as np
-from collections import Mapping
+try:
+    from collections.abc import Mapping as MappingABC
+except ImportError:
+    from collections import Mapping as MappingABC
 
 
 from ..utilities.future_from_2 import str, unicode
@@ -249,7 +252,7 @@ class HDFDeepBunch(object):
 
         def recursive_action(subref, data_dict):
             for key, value in list(data_dict.items()):
-                if isinstance(value, Mapping):
+                if isinstance(value, MappingABC):
                     if groups_overwrite:
                         self.require_deleted(key)
                         subsubref = subref[key]
@@ -391,4 +394,4 @@ class HDFDeepBunch(object):
             yield key, self[key]
         return
 
-Mapping.register(HDFDeepBunch)
+MappingABC.register(HDFDeepBunch)

@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 """
-from collections import Mapping
+try:
+    from collections.abc import Mapping as MappingABC
+except ImportError:
+    from collections import Mapping as MappingABC
 from ..utilities.future_from_2 import str, object, repr_compat, unicode
 from ..utilities.unique import NOARG
 
@@ -42,10 +45,10 @@ class TagBunch(object):
                 self._dict[key] = item
 
         item = self._dict[key]
-        if isinstance(item, Mapping):
+        if isinstance(item, MappingABC):
             subtags = {}
             for tagkey, tagdict in list(self._tag_dicts.items()):
-                if isinstance(tagdict, Mapping):
+                if isinstance(tagdict, MappingABC):
                     try:
                         subtags[tagkey] = tagdict[key]
                     except KeyError:
@@ -165,4 +168,4 @@ class TagBunch(object):
         return list(self.items())
 
 
-Mapping.register(TagBunch)
+MappingABC.register(TagBunch)

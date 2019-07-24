@@ -3,7 +3,10 @@
 """
 from __future__ import division, print_function, unicode_literals
 from ..utilities.future_from_2 import repr_compat, object, str, unicode
-from collections import Mapping
+try:
+    from collections.abc import Mapping as MappingABC
+except ImportError:
+    from collections import Mapping as MappingABC
 
 #use local noarg to not conflict with others
 _NOARG = lambda : _NOARG
@@ -50,7 +53,7 @@ class DeepBunch(object):
             for idx, gname in enumerate(self._vpath):
                 mydict = mydict[gname]
                 #TODO: make better assert
-                assert(isinstance(mydict, Mapping))
+                assert(isinstance(mydict, MappingABC))
         except KeyError:
             if idx != 0:
                 self._dict = mydict
@@ -78,7 +81,7 @@ class DeepBunch(object):
         for gname in self._vpath:
             mydict = mydict.setdefault(gname, {})
             #TODO: make better assert
-            assert(isinstance(mydict, Mapping))
+            assert(isinstance(mydict, MappingABC))
         self._vpath = ()
         self._dict = mydict
         return mydict
@@ -92,7 +95,7 @@ class DeepBunch(object):
             )
         try:
             item = mydict[key]
-            if isinstance(item, Mapping):
+            if isinstance(item, MappingABC):
                 return self.__class__(
                     item,
                     vpath = self._vpath,
@@ -180,7 +183,7 @@ class DeepBunch(object):
         if self._vpath is None:
             def recursive_op(to_db, from_db):
                 for key, val in list(from_db.items()):
-                    if isinstance(val, Mapping):
+                    if isinstance(val, MappingABC):
                         try:
                             rec_div = to_db[key]
                         except KeyError:
@@ -193,7 +196,7 @@ class DeepBunch(object):
         else:
             def recursive_op(to_db, from_db):
                 for key, val in list(from_db.items()):
-                    if isinstance(val, Mapping):
+                    if isinstance(val, MappingABC):
                         recursive_op(to_db[key], val)
                     else:
                         to_db[key] = val
@@ -321,7 +324,7 @@ class DeepBunch(object):
     def __call__(self):
         raise RuntimeError("DeepBunch cannot be called, perhaps you are trying to call a function on something which should be contained by the parent deepbunch")
 
-Mapping.register(DeepBunch)
+MappingABC.register(DeepBunch)
 
 class DeepBunchSingleAssign(DeepBunch):
     def __setitem__(self, key, item):

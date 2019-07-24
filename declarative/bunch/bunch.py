@@ -4,7 +4,13 @@
 from __future__ import (division, print_function, unicode_literals)
 from ..utilities.future_from_2 import str, object, dict, repr_compat, unicode
 
-from collections import Mapping, MutableSequence
+try:
+    from collections.abc import Mapping as MappingABC
+    from collections.abc import MutableSequence as MutableSequenceABC
+except ImportError:
+    from collections import MutableSequence as MutableSequenceABC
+    from collections import Mapping as MappingABC
+
 import numpy as np
 import copy
 
@@ -95,7 +101,7 @@ class Bunch(object):
         return items
 
     def __getitem__(self, key):
-        if isinstance(key, (slice, np.ndarray, MutableSequence)):
+        if isinstance(key, (slice, np.ndarray, MutableSequenceABC)):
             rebuild = dict()
             for vkey, val in self._mydict.items():
                 if isinstance(val, np.ndarray):
@@ -222,9 +228,9 @@ class FrozenBunch(Bunch):
         return self.__class__(copy.deepcopy(self._mydict, memo))
 
 
-Mapping.register(Bunch)
-Mapping.register(FrozenBunch)
-Mapping.register(WriteCheckBunch)
+MappingABC.register(Bunch)
+MappingABC.register(FrozenBunch)
+MappingABC.register(WriteCheckBunch)
 
 class HookBunch(Bunch):
 
@@ -333,5 +339,5 @@ class HookBunch(Bunch):
             return
 
 
-Mapping.register(HookBunch)
+MappingABC.register(HookBunch)
 
