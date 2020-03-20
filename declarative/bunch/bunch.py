@@ -137,6 +137,9 @@ class Bunch(object):
     def __deepcopy__(self, memo):
         return self.__class__(copy.deepcopy(self._mydict, memo))
 
+    def copy(self):
+        return self.__class__(self._mydict.copy())
+
     __contains__ = gen_func('__contains__')
     __eq__       = gen_func('__eq__')
     __format__   = gen_func('__format__')
@@ -151,7 +154,6 @@ class Bunch(object):
     __sizeof__   = gen_func('__sizeof__')
     __str__      = gen_func('__str__')
     clear        = gen_func('clear')
-    copy         = gen_func('copy')
     fromkeys     = gen_func('fromkeys')
     get          = gen_func('get')
     items        = gen_func('items')

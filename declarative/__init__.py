@@ -39,11 +39,18 @@ from .callbacks import (
 
 from .bunch import (
     Bunch,
-    DepBunch,
-    depB_property,
     FrozenBunch,
     DeepBunch,
     TagBunch,
+    DepBunch,
+    depB_property,
+    depB_value,
+    depB_extract,
+    depB_lambda,
+    depBp,
+    depBv,
+    depBe,
+    depBl,
 )
 
 from .overridable_object import (

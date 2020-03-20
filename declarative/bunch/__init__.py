@@ -9,6 +9,13 @@ from .bunch import (
 from .depbunch import (
     DepBunch,
     depB_property,
+    depB_value,
+    depB_extract,
+    depB_lambda,
+    depBp,
+    depBv,
+    depBe,
+    depBl,
 )
 
 from .deep_bunch import (

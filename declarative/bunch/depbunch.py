@@ -22,11 +22,12 @@ def simple_setter(self, val):
     return val
 
 
+#TODO, make __set_name__ work via metaclass in python <3.6
 class DepBunch(object):
     #just a unique object to prevent setting
     TAG_NO_SET = ("Don't Set the value", Exception)
 
-    def __build__(self, *args, **kwargs):
+    def __build__(self):
         return
 
     def __init__(
@@ -122,13 +123,11 @@ class DepBunch(object):
     def get_raw(self, name, default = NOARG):
         val = self._values.get(name, default)
         if val is NOARG:
-            return self.compute(name)
+            return self._compute(name)
         return val
 
     def get_default(self, name, default):
-        if name in self._values:
-            return self._values[name]
-        return default
+        return self._values.get(name, default)
 
     def __getattr__(self, name):
         return self[name]
@@ -197,13 +196,14 @@ class DepBunch(object):
         super(DepBunch, self).__setattr__('_current_autodep', self._autodeps_generators[name])
         super(DepBunch, self).__setattr__('_current_func',  name)
 
+        #calls with no arguments except self
+        ideps = self._value_dependencies_inv.get(name, None)
+        #print(name, ideps)
+        if ideps is not None:
+            #TODO, better error
+            raise RuntimeError("Must be infinitely recursive! {} has apparent dependencies {}".format(name, ideps))
+
         try:
-            #calls with no arguments except self
-            ideps = self._value_dependencies_inv.get(name, None)
-            #print(name, ideps)
-            if ideps is not None:
-                #TODO, better error
-                raise RuntimeError("Must be infinitely recursive!")
             ideps = set()
             self._value_dependencies_inv[name] = ideps
 
@@ -252,7 +252,8 @@ class DepBunch(object):
             ideps = set()
             self._value_dependencies_inv[name] = ideps
 
-            newval   = setter(self, val)
+            #Where the magic happens
+            newval = setter(self, val)
 
             if newval is self.TAG_NO_SET:
                 pass
@@ -496,7 +497,6 @@ class DepBunchDescriptor(object):
     def __init__(
         self,
         fgetset,
-        name = None,
         doc = None,
         autodeps = True,
         original_callname = None,
@@ -512,19 +512,20 @@ class DepBunchDescriptor(object):
 
         self.autodeps = autodeps
 
-        if name is None:
-            self.__name__ = fgetset.__name__
-        else:
-            self.__name__ = name
         if doc is None:
             self.__doc__ = fgetset.__doc__
         else:
             self.__doc__ = doc
+
         if original_callname is not None:
             self.original_callname = original_callname
         else:
             self.original_callname = self.__class__.__name__
+
         return
+
+    def __set_name__(self, owner, name):
+        self.__name__ = name
 
     def __get__(self, obj, cls):
         if obj is None:
@@ -548,7 +549,9 @@ class DepBunchDescriptor(object):
         obj.add_setter(name, self.fset, autodeps = self.autodeps, clear = False)
         return
 
-depB_property = DepBunchDescriptor
+
+#depB_property = DepBunchDescriptor
+
 
 def depB_property(
     fgetset = None,
@@ -561,3 +564,28 @@ def depB_property(
         def deco_grab(func):
             return DepBunchDescriptor(func, **kwargs)
         return deco_grab
+
+def depB_lambda(
+    fgetset = None,
+    **kwargs
+):
+    """
+    For lambda function usage
+    """
+    return DepBunchDescriptor(fgetset, **kwargs)
+
+def depB_extract(aname, vname, **kwargs):
+    def fgetset(self):
+        return getattr(self, aname)[vname]
+    return DepBunchDescriptor(fgetset, name = vname, **kwargs)
+
+def depB_value(fvalue, **kwargs):
+    def fgetset(self, value = fvalue):
+        return value
+    return DepBunchDescriptor(fgetset, **kwargs)
+
+depBe = depB_extract
+depBv = depB_value
+depBl = depB_lambda
+depBp = depB_property
+
