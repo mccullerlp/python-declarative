@@ -27,7 +27,7 @@ class DepBunch(object):
     #just a unique object to prevent setting
     TAG_NO_SET = ("Don't Set the value", Exception)
 
-    def __build__(self):
+    def __build__(self, _args = None, **kwargs):
         return
 
     def __init__(
@@ -97,7 +97,7 @@ class DepBunch(object):
             super(DepBunch, self).__setattr__('_autodeps_generators', dict(copy._autodeps_generators))
 
         if copy is None:
-            self.__build__(_args, **kwargs)
+            self.__build__(_args = _args, **kwargs)
         return
 
     def copy(self, lightweight = True):
