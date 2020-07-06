@@ -5,7 +5,7 @@ import sys
 from setuptools import find_packages, setup
 import setup_helper
 
-version = '1.2'
+version = '1.2.0'
 
 cmdclass = setup_helper.version_checker(version, 'declarative')
 
