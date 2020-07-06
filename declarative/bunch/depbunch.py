@@ -2,6 +2,7 @@
 """
 """
 from __future__ import division, print_function, unicode_literals
+import sys
 import collections
 import inspect
 import warnings
@@ -29,6 +30,26 @@ class DepBunch(object):
 
     def __build__(self, _args = None, **kwargs):
         return
+
+    #this adds in a metaclass-like hack to give python2 access to the __set_name__
+    if sys.version_info[0] < 3:
+        def __new__(cls, *args, **kwargs):
+            attrsetup = '__hack_meta_{}_setup__'.format(cls.__name__)
+            try:
+                getattr(cls, attrsetup)
+            except AttributeError:
+                for aname in dir(cls):
+                    aval = getattr(cls, aname)
+                    try:
+                        acall = aval.__set_name__
+                    except AttributeError:
+                        pass
+                    else:
+                        acall(cls, aname)
+                #now flag the class
+                setattr(cls, attrsetup, True)
+            obj = super(DepBunch, cls).__new__(cls, *args, **kwargs)
+            return obj
 
     def __init__(
         self,
