@@ -32,7 +32,7 @@ class DepBunch(object):
         return
 
     #this adds in a metaclass-like hack to give python2 access to the __set_name__
-    if sys.version_info[0] < 3:
+    if sys.version_info < (3, 6):
         def __new__(cls, *args, **kwargs):
             attrsetup = '__hack_meta_{}_setup__'.format(cls.__name__)
             try:

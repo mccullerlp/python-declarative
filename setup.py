@@ -5,7 +5,7 @@ import sys
 from setuptools import find_packages, setup
 import setup_helper
 
-version = '1.1.2'
+version = '1.2'
 
 cmdclass = setup_helper.version_checker(version, 'declarative')
 
@@ -41,7 +41,7 @@ setup(
         'metaclass',
     ],
     classifiers      = [
-        'Development Status :: 3 - Alpha ',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
@@ -52,6 +52,8 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 )
