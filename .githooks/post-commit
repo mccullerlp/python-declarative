@@ -9,8 +9,19 @@
 ##   cp git-create-revisioninfo-hook.sh .git/hooks/post-checkout
 ##   cp git-create-revisioninfo-hook.sh .git/hooks/post-merge
 ##   chmod +x .git/hooks/post-*
+LC_ALL=C
 
-FILENAME='declarative/auto_version.py'
+local_branch="$(git rev-parse --abbrev-ref HEAD)"
+
+valid_branch_regex="^(debian|redhat)\/[a-z0-9._-]+$"
+
+if [[ ! $local_branch =~ $valid_branch_regex ]]
+then
+    #skip the hook if we are on a debian or redhat branch
+    exit 0
+fi
+
+FILENAME='IIRrational/auto_version.py'
 
 #exec 1>&2
 branch=`git rev-parse --abbrev-ref HEAD`
