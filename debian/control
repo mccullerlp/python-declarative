@@ -1,0 +1,56 @@
+Source: iirrational
+Section: python
+Priority: optional
+Maintainer: Lee McCuller <lee.mcculler@ligo.org>
+Standards-Version: 3.9.8
+Homepage: https://git.ligo.org/lee.mcculler/iirrational
+Vcs-Git: https://git.ligo.org/lee.mcculler/iirrational.git
+Build-Depends:
+ debhelper (>= 9),
+ dh-python,
+ python-all,
+ python-dateutil,
+ python-requests,
+ python-setuptools,
+ python-setuptools-scm,
+ python3-all,
+ python3-dateutil,
+ python3-requests,
+ python3-setuptools,
+ python3-setuptools-scm,
+
+Package: python-iirrational
+Architecture: all
+Depends:
+ python-declarative,
+ python-scipy,
+ python-numpy,
+ python-h5py,
+ python-matplotlib,
+ ${misc:Depends},
+ ${python:Depends},
+Description:
+ SISO Frequency-domain system identification through rational function fitting without an initial guess.
+
+Package: python3-iirrational
+Architecture: all
+Depends:
+ python3-declarative,
+ python3-scipy,
+ python3-numpy,
+ python3-h5py,
+ python3-matplotlib,
+ ${misc:Depends},
+ ${python3:Depends},
+Description:
+ SISO Frequency-domain system identification through rational function fitting without an initial guess.
+ Python3 support.
+
+Package: iirrational
+Architecture: all
+Depends:
+ python3-iirrational (= ${source:Version}),
+ ${misc:Depends},
+ ${python3:Depends},
+Description:
+  Command line utility for running IIRrational

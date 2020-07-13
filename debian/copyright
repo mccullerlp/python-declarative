@@ -1,0 +1,17 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: IIRrational
+Upstream-Contact: Lee McCuller <Lee McCuller@ligo.org>
+Source: https://git.ligo.org/lee.mcculler/iirrational
+
+Files: *
+Copyright: 2019, Lee McCuller <lee.mcculler@ligo.org>
+License: GPL-3+
+
+License: GPL-3+
+ This package is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 3 of the License, or
+ (at your option) any later version.
+ .
+ On Debian systems, the complete text of the GNU General Public License
+ version 3 can be found in file "/usr/share/common-licenses/GPL-3".
