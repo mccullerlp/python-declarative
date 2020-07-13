@@ -1,10 +1,10 @@
-Source: iirrational
+Source: python-declarative
 Section: python
 Priority: optional
 Maintainer: Lee McCuller <lee.mcculler@ligo.org>
 Standards-Version: 3.9.8
-Homepage: https://git.ligo.org/lee.mcculler/iirrational
-Vcs-Git: https://git.ligo.org/lee.mcculler/iirrational.git
+Homepage: https://github.com/mccullerlp/python-declarative
+Vcs-Git: https://github.com/mccullerlp/python-declarative.git
 Build-Depends:
  debhelper (>= 9),
  dh-python,
@@ -22,35 +22,17 @@ Build-Depends:
 Package: python-iirrational
 Architecture: all
 Depends:
- python-declarative,
- python-scipy,
- python-numpy,
- python-h5py,
- python-matplotlib,
  ${misc:Depends},
  ${python:Depends},
 Description:
- SISO Frequency-domain system identification through rational function fitting without an initial guess.
+  declarative programming tools for python classes.
 
 Package: python3-iirrational
 Architecture: all
 Depends:
- python3-declarative,
- python3-scipy,
- python3-numpy,
- python3-h5py,
- python3-matplotlib,
  ${misc:Depends},
  ${python3:Depends},
 Description:
- SISO Frequency-domain system identification through rational function fitting without an initial guess.
- Python3 support.
+  declarative programming tools for python classes.
+  Python3 support.
 
-Package: iirrational
-Architecture: all
-Depends:
- python3-iirrational (= ${source:Version}),
- ${misc:Depends},
- ${python3:Depends},
-Description:
-  Command line utility for running IIRrational
