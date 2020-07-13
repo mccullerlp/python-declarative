@@ -19,7 +19,7 @@ Build-Depends:
  python3-setuptools,
  python3-setuptools-scm,
 
-Package: python-iirrational
+Package: python-declarative
 Architecture: all
 Depends:
  ${misc:Depends},
@@ -27,7 +27,7 @@ Depends:
 Description:
   declarative programming tools for python classes.
 
-Package: python3-iirrational
+Package: python3-declarative
 Architecture: all
 Depends:
  ${misc:Depends},
