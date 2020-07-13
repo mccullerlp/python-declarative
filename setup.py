@@ -20,7 +20,10 @@ setup(
     author           = 'Lee McCuller',
     author_email     = 'Lee.McCuller@gmail.com',
     license          = 'Apache v2',
-    packages         = find_packages(exclude = ['docs']),
+    packages         = find_packages(exclude = [
+        'docs',
+        'declarative/utilities/future2.py' if sys.version_info >= (3,) else 'declarative/utilities/future3.py'
+    ]),
     description      = (
         'Collection of decorators and base classes to allow a declarative style of programming. Excellent for event-loop task registration.'
         'Also included are nesting attribute-access dictionaries (Bunches) as well as value storage with callbacks. Relatively Magic-Free.'
