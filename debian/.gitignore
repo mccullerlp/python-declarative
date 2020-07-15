@@ -1,0 +1,6 @@
+.pybuild/
+python3-declarative/
+python3-declarative.debhelper.log
+python-declarative/
+python-declarative.debhelper.log
+tmp/

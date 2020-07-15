@@ -9,6 +9,8 @@ version = '1.2.0'
 
 cmdclass = setup_helper.version_checker(version, 'declarative')
 
+print(find_packages(exclude = ['docs']))
+
 extra_install_requires = []
 if sys.version_info < (3, 0):
     extra_install_requires.append('future')
