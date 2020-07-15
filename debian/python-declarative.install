@@ -1,1 +1,14 @@
-usr/lib/python2.*/*-packages/declarative*
+usr/lib/python2.*/*-packages/declarative/bunch/*
+usr/lib/python2.*/*-packages/declarative/callbacks/*
+usr/lib/python2.*/*-packages/declarative/properties/*
+usr/lib/python2.*/*-packages/declarative/argparse/*
+usr/lib/python2.*/*-packages/declarative-*/*
+usr/lib/python2.*/*-packages/declarative/*.py
+usr/lib/python2.*/*-packages/declarative/*.pyc
+usr/lib/python2.*/*-packages/declarative/utilities/future2.py*
+usr/lib/python2.*/*-packages/declarative/utilities/future_from_2.py*
+usr/lib/python2.*/*-packages/declarative/utilities/__init__.py*
+usr/lib/python2.*/*-packages/declarative/utilities/interrupt_delay.py*
+usr/lib/python2.*/*-packages/declarative/utilities/representations.py*
+usr/lib/python2.*/*-packages/declarative/utilities/super_base.py*
+usr/lib/python2.*/*-packages/declarative/utilities/unique.py*

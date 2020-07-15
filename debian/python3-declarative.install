@@ -1,1 +1,15 @@
-usr/lib/python3.*/*-packages/declarative*
+usr/lib/python3.*/*-packages/declarative/bunch/*
+usr/lib/python3.*/*-packages/declarative/callbacks/*
+usr/lib/python3.*/*-packages/declarative/properties/*
+usr/lib/python3.*/*-packages/declarative/argparse/*
+usr/lib/python3.*/*-packages/declarative/__pycache__/*
+usr/lib/python3.*/*-packages/declarative-*/*
+usr/lib/python3.*/*-packages/declarative/*.py
+usr/lib/python3.*/*-packages/declarative/utilities/__pycache__/*
+usr/lib/python3.*/*-packages/declarative/utilities/future3.py*
+usr/lib/python3.*/*-packages/declarative/utilities/future_from_2.py*
+usr/lib/python3.*/*-packages/declarative/utilities/__init__.py*
+usr/lib/python3.*/*-packages/declarative/utilities/interrupt_delay.py*
+usr/lib/python3.*/*-packages/declarative/utilities/representations.py*
+usr/lib/python3.*/*-packages/declarative/utilities/super_base.py*
+usr/lib/python3.*/*-packages/declarative/utilities/unique.py*

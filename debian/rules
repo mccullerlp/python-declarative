@@ -1,9 +1,7 @@
 #!/usr/bin/make -f
 
-override_dh_auto_install:
-	dh_auto_install
-	ls *
-	false
+override_dh_missing:
+	dh_missing --fail-missing
 
 %:
 	dh $@ --with python2,python3 --buildsystem=pybuild
