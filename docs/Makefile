@@ -10,13 +10,17 @@ BUILDDIR      = ../build/sphinx
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
-ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
+ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+
+IPYNB := $(shell find . -name '*.ipynb' -not -path '*/.ipynb_checkpoints/*' | sed 's/.* .*//g')
+IPYRST := $(patsubst %.ipynb,%.rst, $(IPYNB))
 
 .PHONY: help clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  html       to make standalone HTML files"
+	@echo "  livehtml   to make standalone HTML files while watching the directory (requires sphinx-autobuild)"
 	@echo "  dirhtml    to make HTML files named index.html in directories"
 	@echo "  singlehtml to make a single large HTML file"
 	@echo "  pickle     to make pickle files"
@@ -37,7 +41,7 @@ clean:
 	-rm -rf $(BUILDDIR)/*
 
 livehtml:
-    sphinx-autobuild -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	sphinx-autobuild -i .#* -i *.pyc -i .*.swp -i .*.swo -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
@@ -51,6 +55,11 @@ dirhtml:
 
 singlehtml:
 	$(SPHINXBUILD) -b singlehtml $(ALLSPHINXOPTS) $(BUILDDIR)/singlehtml
+	@echo
+	@echo "Build finished. The HTML page is in $(BUILDDIR)/singlehtml."
+
+optimizer-dcc:
+	$(SPHINXBUILD) -D master_doc="optimizer/overview" -E -b singlehtml $(ALLSPHINXOPTS) $(BUILDDIR)/optimizer-dcc
 	@echo
 	@echo "Build finished. The HTML page is in $(BUILDDIR)/singlehtml."
 
@@ -131,3 +140,20 @@ doctest:
 	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) $(BUILDDIR)/doctest
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in $(BUILDDIR)/doctest/output.txt."
+
+ipynb: $(IPYRST)
+
+svg-embed: $(SVGVIEW)
+
+%_view.svg: %_embed.svg
+	./inkscape/embedimage.py $< > $@
+
+#TODO maybe use a config file for this
+%.rst: %.ipynb
+	jupyter nbconvert --NbConvertApp.output_files_dir='{notebook_name}-ipynb' --to rst $<
+
+#sed -i '1s;^;#$(<F) [notebook]($(<F))\n;' $@
+#jupyter nbconvert --NbConvertApp.output_files_dir='{notebook_name}-ipynb' --to html $<
+
+%.html: %.ipynb
+	jupyter nbconvert --NbConvertApp.output_files_dir='{notebook_name}-ipynb' --to html $<
