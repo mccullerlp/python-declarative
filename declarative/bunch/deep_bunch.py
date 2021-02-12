@@ -26,7 +26,8 @@ class DeepBunch(object):
     def __init__(
         self,
         mydict = None,
-        vpath = True,
+        writeable = None,
+        _vpath = None,
     ):
         if mydict is None:
             mydict = dict()
@@ -35,14 +36,21 @@ class DeepBunch(object):
             mydict = dict(mydict)
         super(DeepBunch, self).__setattr__('_dict', mydict)
 
-        if vpath is True:
-            vpath = ()
-        elif vpath is False:
-            vpath = None
-        elif vpath is not None:
-            vpath = tuple(vpath)
+        if _vpath is None:
+            if writeable is None:
+                writeable = True
+            if writeable:
+                _vpath = (),
+
+        if _vpath is True:
+            _vpath = ()
+        elif _vpath is False:
+            pass
+        elif _vpath is not None:
+            _vpath = tuple(_vpath)
+        assert(_vpath is not None)
         #self.__dict__['_vpath'] = vpath
-        super(DeepBunch, self).__setattr__('_vpath', vpath)
+        super(DeepBunch, self).__setattr__('_vpath', _vpath)
         return
 
     def _resolve_dict(self):
@@ -89,23 +97,25 @@ class DeepBunch(object):
     def __getitem__(self, key):
         mydict = self._resolve_dict()
         if mydict is None:
+            if self._vpath is False:
+                raise RuntimeError("This DeepBunch cannot index sub-dictionaries which do not exist.")
             return self.__class__(
-                self._dict,
-                self._vpath + (key,),
+                mydict = self._dict,
+                _vpath = self._vpath + (key,),
             )
         try:
             item = mydict[key]
             if isinstance(item, MappingABC):
                 return self.__class__(
-                    item,
-                    vpath = self._vpath,
+                    mydict = item,
+                    _vpath = self._vpath,
                 )
             return item
         except KeyError as E:
-            if self._vpath is not None:
+            if self._vpath is not False:
                 return self.__class__(
-                    self._dict,
-                    self._vpath + (key,),
+                    mydict = self._dict,
+                    _vpath = self._vpath + (key,),
                 )
             if str(E).lower().find('object not found') != -1:
                 raise KeyError("key '{0}' not found in {1}".format(key, self))
@@ -180,7 +190,7 @@ class DeepBunch(object):
         return
 
     def update_recursive(self, db = None, **kwargs):
-        if self._vpath is None:
+        if self._vpath is False:
             def recursive_op(to_db, from_db):
                 for key, val in list(from_db.items()):
                     if isinstance(val, MappingABC):
@@ -223,7 +233,7 @@ class DeepBunch(object):
 
     @repr_compat
     def __repr__(self):
-        if self._vpath is None:
+        if self._vpath is False:
             vpath = 'False'
         elif self._vpath == ():
             vpath = 'True'

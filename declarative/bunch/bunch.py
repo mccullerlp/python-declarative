@@ -87,7 +87,10 @@ class Bunch(object):
                     else:
                         p.breakable()
                         first = False
-                    p.pretty(k)
+                    if isinstance(k, str):
+                        p.text(k)
+                    else:
+                        p.pretty(k)
                     p.text(' = ')
                     p.pretty(v)
                 if not first:
