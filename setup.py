@@ -28,8 +28,9 @@ setup(
     install_requires =[] + extra_install_requires,
     extras_require   ={
         "hdf" : ["h5py"],
-        "test" : ["pytest"],
     },
+    tests_require=['pytest'],
+    test_suite   = 'pytest',
     cmdclass         = cmdclass,
     zip_safe         = True,
     keywords         = [
