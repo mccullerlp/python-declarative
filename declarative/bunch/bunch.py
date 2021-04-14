@@ -4,12 +4,8 @@
 from __future__ import (division, print_function, unicode_literals)
 from ..utilities.future_from_2 import str, object, dict, repr_compat, unicode
 
-try:
-    from collections.abc import Mapping as MappingABC
-    from collections.abc import MutableSequence as MutableSequenceABC
-except ImportError:
-    from collections import MutableSequence as MutableSequenceABC
-    from collections import Mapping as MappingABC
+from collections.abc import Mapping
+from collections.abc import MutableSequence
 
 import numpy as np
 import copy
@@ -87,7 +83,10 @@ class Bunch(object):
                     else:
                         p.breakable()
                         first = False
-                    p.pretty(k)
+                    if isinstance(k, str):
+                        p.text(k)
+                    else:
+                        p.pretty(k)
                     p.text(' = ')
                     p.pretty(v)
                 if not first:
@@ -101,7 +100,7 @@ class Bunch(object):
         return items
 
     def __getitem__(self, key):
-        if isinstance(key, (slice, np.ndarray, MutableSequenceABC)):
+        if isinstance(key, (slice, np.ndarray, MutableSequence)):
             rebuild = dict()
             for vkey, val in self._mydict.items():
                 if isinstance(val, np.ndarray):
@@ -182,7 +181,7 @@ class WriteCheckBunch(object):
 class FrozenBunch(Bunch):
     """
     """
-    def __init__(self, inner_dict = None, *args, **kwds):
+    def __init__(self, inner_dict = None, hash_ignore = (), *args, **kwds):
         if inner_dict is None or args or kwds:
             if args:
                 _mydict = dict(inner_dict, *args, **kwds)
@@ -190,6 +189,7 @@ class FrozenBunch(Bunch):
                 _mydict = dict(**kwds)
         else:
             _mydict = dict(inner_dict)
+        self.__dict__['hash_ignore'] = set(hash_ignore)
         self.__dict__['_mydict'] = _mydict
         return
 
@@ -204,7 +204,10 @@ class FrozenBunch(Bunch):
             return self.__dict__['__hash']
         except KeyError:
             pass
-        l = tuple(sorted(self._mydict.items()))
+        d2 = dict(self._mydict)
+        for k in self.hash_ignore:
+            d2.pop(k)
+        l = tuple(sorted(d2.items()))
         self.__dict__['__hash'] = hash(l)
         return self.__dict__['__hash']
 
@@ -223,16 +226,21 @@ class FrozenBunch(Bunch):
     def __setattr__(self, key, item):
         raise RuntimeError("Bunch is Frozen")
 
+    def _insertion_hack(self, key, item):
+        """
+        Allows one to insert an item even after construction. This violates the
+        "frozen" immutability property, but allows constructing FrozenBunch's
+        that link to each other. This should only be done immediately after
+        construction, before hash is ever called
+        """
+        self._mydict[key] = item
+
     def __delattr__(self, key):
         raise RuntimeError("Bunch is Frozen")
 
     def __deepcopy__(self, memo):
         return self.__class__(copy.deepcopy(self._mydict, memo))
 
-
-MappingABC.register(Bunch)
-MappingABC.register(FrozenBunch)
-MappingABC.register(WriteCheckBunch)
 
 class HookBunch(Bunch):
 
@@ -341,5 +349,7 @@ class HookBunch(Bunch):
             return
 
 
-MappingABC.register(HookBunch)
-
+Mapping.register(Bunch)
+Mapping.register(FrozenBunch)
+Mapping.register(WriteCheckBunch)
+Mapping.register(HookBunch)

@@ -44,34 +44,43 @@ class HDFDeepBunch(object):
     def __init__(
         self,
         hdf = None,
-        vpath = None,
         writeable = False,
         overwrite = False,
+        _vpath    = None,
     ):
         if isinstance(hdf, str):
             if writeable:
                 hdf = h5py.File(hdf, 'a')
-                if vpath is None:
-                    vpath = True
+                if _vpath is None:
+                    _vpath = True
             else:
                 hdf = h5py.File(hdf, 'r')
+                if _vpath is None:
+                    _vpath = False
+        else:
+            if writeable:
+                if _vpath is None:
+                    _vpath = True
+            else:
+                if _vpath is None:
+                    _vpath = False
+
+            #expected to be an HDF File object
+            if hdf.file.mode not in ('r+', 'a', 'a+', 'w', 'w+'):
+                if _vpath is not None and _vpath is not False:
+                    raise RuntimeError("Can't open file for writing, virtual paths should not be used")
+        assert(_vpath is not None)
 
         #access through super is necessary because of the override on __setattr__ can't see these slots
         super(HDFDeepBunch, self).__setattr__('_hdf', hdf)
         super(HDFDeepBunch, self).__setattr__('_overwrite', overwrite)
 
-        if hdf.file.mode not in ('r+', 'a', 'a+', 'w', 'w+'):
-            if vpath is not None:
-                raise RuntimeError("Can't open file for writing, virtual paths should not be used")
-
-        if vpath is True:
-            vpath = ()
-        elif vpath is False:
-            vpath = None
-        elif vpath is not None:
-            vpath = tuple(vpath)
-        #self.__dict__['_vpath'] = vpath
-        super(HDFDeepBunch, self).__setattr__('_vpath', vpath)
+        if _vpath is True:
+            _vpath = ()
+        elif _vpath is not False:
+            _vpath = tuple(_vpath)
+        #self.__dict__['_vpath'] = _vpath
+        super(HDFDeepBunch, self).__setattr__('_vpath', _vpath)
         return
 
     def _resolve_hdf(self):
@@ -103,16 +112,16 @@ class HDFDeepBunch(object):
     @property
     def overwrite(self):
         return self.__class__(
-            self._hdf,
-            vpath = self._vpath,
+            hdf       = self._hdf,
+            _vpath    = self._vpath,
             overwrite = True,
         )
 
     @property
     def safewrite(self):
         return self.__class__(
-            self._hdf,
-            vpath = self._vpath,
+            hdf       = self._hdf,
+            _vpath    = self._vpath,
             overwrite = False,
         )
 
@@ -130,17 +139,20 @@ class HDFDeepBunch(object):
     def __getitem__(self, key):
         hdf = self._resolve_hdf()
         if hdf is None:
+            #TODO, better error message when _vpath is False
+            if self._vpath is False:
+                raise RuntimeError("HDFDeepBunch not set up for virtual paths, groups must exist in the file to access using __getitem__ / '[]'")
             return self.__class__(
-                self._hdf,
-                self._vpath + (key,),
-                self._overwrite,
+                hdf       = self._hdf,
+                _vpath    = self._vpath + (key,),
+                overwrite = self._overwrite,
             )
         try:
             item = hdf[key]
             if hdf_group_is(item):
                 return self.__class__(
-                    item,
-                    vpath = self._vpath,
+                    hdf       = item,
+                    _vpath    = self._vpath,
                     overwrite = self._overwrite,
                 )
             elif isinstance(item, (h5py.Dataset)):
@@ -154,11 +166,11 @@ class HDFDeepBunch(object):
                 return None
             return item
         except KeyError as E:
-            if self._vpath is not None:
+            if self._vpath is not False:
                 return self.__class__(
-                    self._hdf,
-                    self._vpath + (key,),
-                    self._overwrite,
+                    hdf       = self._hdf,
+                    _vpath    = self._vpath + (key,),
+                    overwrite = self._overwrite,
                 )
             if str(E).lower().find('object not found') != -1:
                 raise KeyError("key '{0}' not found in {1}".format(key, self))
@@ -179,7 +191,7 @@ class HDFDeepBunch(object):
                 hdf[key] = item
             return
         except TypeError:
-            print((item, type(item)))
+            #print((item, type(item)))
             raise TypeError("Can't insert {0} into {1} at key {2}".format(item, hdf, key))
         except (RuntimeError, ValueError) as E:
             if str(E).lower().find('name already exists') != -1 and self._overwrite:
@@ -337,19 +349,13 @@ class HDFDeepBunch(object):
 
     @repr_compat
     def __repr__(self):
-        if self._vpath is None:
-            vpath = 'False'
-        elif self._vpath == ():
-            vpath = 'True'
-        else:
-            vpath = self._vpath
         return (
-            '{0}({1}, vpath={2}, overwrite={3})'
+            '{0}({1}, overwrite={2}, vpath={3})'
         ).format(
             self.__class__.__name__,
             self._hdf,
-            vpath,
-            self._overwrite
+            self._overwrite,
+            self._vpath,
         )
 
     def __iter__(self):

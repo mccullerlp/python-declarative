@@ -4,6 +4,9 @@ Pulls in the future library requirement if running on python2
 """
 from __future__ import (absolute_import, division, print_function)
 import sys
+import warnings
+
+warnings.warn("Compatibility support for python2 has been dropped", DeprecationWarning, stacklevel=2)
 
 if sys.version_info < (3, 0, 0):
     #requires the future library
@@ -73,9 +76,7 @@ if PY3:
         raise_from_with_traceback,
     )
 else:
-    from .future2 import (
-        raise_from_with_traceback,
-    )
+    raise NotImplementedError("Support for python2 compatibility has been dropped")
 
 def with_metaclass(meta, *bases):
     """

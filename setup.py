@@ -5,7 +5,7 @@ import sys
 from setuptools import find_packages, setup
 import setup_helper
 
-version = '1.2.0'
+version = '1.3.0'
 
 cmdclass = setup_helper.version_checker(version, 'declarative')
 
@@ -28,8 +28,9 @@ setup(
     install_requires =[] + extra_install_requires,
     extras_require   ={
         "hdf" : ["h5py"],
-        "test" : ["pytest"],
     },
+    tests_require=['pytest'],
+    test_suite   = 'pytest',
     cmdclass         = cmdclass,
     zip_safe         = True,
     keywords         = [
