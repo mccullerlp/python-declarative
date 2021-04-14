@@ -7,5 +7,6 @@ include setup.cfg
 include setup.py
 include setup_helper.py
 
+recursive-include declarative/ *.py
 recursive-include test/ *.py
 

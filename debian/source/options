@@ -1,2 +1,4 @@
 tar-ignore = ".gitlab.ci.yml"
 extend-diff-ignore = "\.gitlab-ci\.yml"
+tar-ignore = ".githooks/post-commit"
+extend-diff-ignore = ".githooks/post-commit"
