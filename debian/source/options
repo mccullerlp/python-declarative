@@ -1,0 +1,2 @@
+tar-ignore = ".gitlab.ci.yml"
+extend-diff-ignore = "\.gitlab-ci\.yml"
