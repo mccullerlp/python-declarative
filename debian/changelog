@@ -1,3 +1,9 @@
+python-declarative (1.3.1-1) stable; urgency=low
+
+  * Fixing build issues
+
+ -- Lee McCuller <lee.mcculler@ligo.org>  Wed, 14 Apr 2021 15:35:30 -0400
+
 python-declarative (1.3.0-1) stable; urgency=low
 
   * Removing python2 support
