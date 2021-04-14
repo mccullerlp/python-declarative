@@ -32,13 +32,13 @@ class OOArgParse(
 ):
     @classmethod
     def __cls_argparse__(
-            cls,
-            args = None,
-            __sys_exit = True,
-            __usage_prog__ = None,
-            base_kwargs = dict(),
-            no_commands = False,
-            **exkwargs
+        cls,
+        args = None,
+        _sys_exit = True,
+        __usage_prog__ = None,
+        base_kwargs = dict(),
+        no_commands = False,
+        **exkwargs
     ):
         arguments = dict()
         commands  = dict()
@@ -210,7 +210,7 @@ class OOArgParse(
             if not cbunch.takes_arguments and args_sub:
                 raise RuntimeError("Final Command does not take additional arguments")
             ret = call(args_sub)
-        if __sys_exit:
+        if _sys_exit:
             sys.exit(ret)
         return ret
 

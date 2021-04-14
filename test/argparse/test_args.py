@@ -32,6 +32,7 @@ class TArgParse(ARG.OOArgParse, OverridableObject):
     """
     Runs the argparse test setup
     """
+
     @ARG.argument(['-a', '--abc'])
     @mproperty
     def atest(self, val = NOARG):
@@ -99,7 +100,7 @@ class TArgParse(ARG.OOArgParse, OverridableObject):
         Group for testing Mutual Exclusivity
         """
 
-    @ARG.command()
+    @ARG.command(takes_arguments = True)
     def run2(self, args):
         """
         Command Description
@@ -120,7 +121,7 @@ class TArgParse(ARG.OOArgParse, OverridableObject):
 
 def test_args():
     print_test_list[:] = []
-    TArgParse.__cls_argparse__(['-a', '1234'])
+    TArgParse.__cls_argparse__(['-a', '1234'], _sys_exit = False)
     assert(
         print_test_list == [
             ("atest: ", '1234'),
@@ -131,7 +132,7 @@ def test_args():
     )
 
     print_test_list[:] = []
-    TArgParse.__cls_argparse__(['-a', '1234', 'run2'])
+    TArgParse.__cls_argparse__(['-a', '1234', 'run2'], _sys_exit = False)
     assert(
         print_test_list == [
             ("run2!", []),
@@ -139,7 +140,7 @@ def test_args():
     )
 
     print_test_list[:] = []
-    TArgParse.__cls_argparse__(['-a', '1234', 'run2', 'a', '-b', 'c'])
+    TArgParse.__cls_argparse__(['-a', '1234', 'run2', 'a', '-b', 'c'], _sys_exit = False)
     assert(
         print_test_list == [
             ("run2!", ['a', '-b', 'c']),
@@ -148,7 +149,7 @@ def test_args():
 
     print_test_list[:] = []
     with pytest.raises(SystemExit):
-        TArgParse.__cls_argparse__(['run_broke'])
+        TArgParse.__cls_argparse__(['run_broke'], _sys_exit = False)
 
     return
 
