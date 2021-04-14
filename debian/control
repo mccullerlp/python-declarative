@@ -8,26 +8,12 @@ Vcs-Git: https://github.com/mccullerlp/python-declarative.git
 Build-Depends:
  debhelper (>= 9),
  dh-python,
- python-all,
- python-dateutil,
- python-numpy,
- python-requests,
- python-setuptools,
- python-setuptools-scm,
  python3-all,
  python3-dateutil,
  python3-numpy,
  python3-requests,
  python3-setuptools,
  python3-setuptools-scm,
-
-Package: python-declarative
-Architecture: all
-Depends:
- ${misc:Depends},
- ${python:Depends},
-Description:
-  declarative programming tools for python classes.
 
 Package: python3-declarative
 Architecture: all
