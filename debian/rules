@@ -1,7 +1,3 @@
 #!/usr/bin/make -f
-
-override_dh_missing:
-	dh_missing --list-missing
-
 %:
 	dh $@ --with python3 --buildsystem=pybuild

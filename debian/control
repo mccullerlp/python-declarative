@@ -20,6 +20,7 @@ Architecture: all
 Depends:
  ${misc:Depends},
  ${python3:Depends},
+ python3-h5py
 Description:
   declarative programming tools for python classes.
   Python3 support.
