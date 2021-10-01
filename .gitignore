@@ -11,6 +11,8 @@ TAGS
 .cache
 core.*
 
+debian
+
 *.syncthing.*
 *sync-conflict*
 *.pyc
